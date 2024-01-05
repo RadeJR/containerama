@@ -1,0 +1,21 @@
+package pages
+
+import "github.com/RadeJR/itcontainers/view/component"
+
+templ Containers(userRole string) {
+	<div id="navbar-items" class="w-full px-2" hx-swap-oob="true">
+		<hr class="border-gray-700"/>
+		@component.NavbarItem("Containers", true, "fa-solid fa-box", "/containers")
+		@component.NavbarItem("Networks", false, "fa-solid fa-network-wired", "/networks")
+		@component.NavbarItem("Secrets", false, "fa-solid fa-key", "/secrets")
+		@component.NavbarItem("Stacks", false, "fa-solid fa-layer-group", "/stacks")
+		<hr class="border-gray-700"/>
+		if userRole == "admin" {
+			@component.NavbarItem("Users", false, "fa-solid fa-users", "/users")
+			@component.NavbarItem("Settings", false, "fa-solid fa-sliders", "/settings")
+		}
+		@component.NavbarItem("Logout", false, "fa-solid fa-right-from-bracket", "/logout")
+		@component.NavbarItem("Account", false, "fa-solid fa-user", "/account")
+	</div>
+	<h1>This is containers page</h1>
+}

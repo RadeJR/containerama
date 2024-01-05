@@ -2,11 +2,11 @@ package component
 
 templ NavbarItem(text string, active bool, iconClass string, route string) {
 	if active {
-		<a class="flex items-center w-full h-12 px-3 mt-2 rounded bg-gray-700 text-gray-300" href="#">
+		<a class="flex items-center w-full h-12 px-3 mt-2 rounded bg-gray-700 text-gray-300" hx-swap="innerHTML" hx-target="#content" hx-get={ route }>
 			@NavbarItemContent(text, iconClass)
 		</a>
 	} else {
-		<a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300" hx-swap="innerHTML" hx-target="#content" hx-get={ route } href="#">
+		<a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300" hx-swap="innerHTML" hx-target="#content" hx-get={ route }>
 			@NavbarItemContent(text, iconClass)
 		</a>
 	}
@@ -26,27 +26,20 @@ templ Navbar(userRole string) {
 			</svg>
 			<span class="ml-2 text-sm font-bold">ITContainers</span>
 		</a>
-		<div class="w-full px-2">
-			<div class="flex flex-col items-center w-full mt-3 border-t border-gray-700">
-				@NavbarItem("Containers", true, "fa-solid fa-box", "/containers")
-				@NavbarItem("Networks", false, "fa-solid fa-network-wired", "/networks")
-				@NavbarItem("Secrets", false, "fa-solid fa-key", "/secrets")
-				@NavbarItem("Stacks", false, "fa-solid fa-layer-group", "/stacks")
-			</div>
+		<div id="navbar-items" class="w-full px-2">
+			<hr class="border-gray-700"/>
+			@NavbarItem("Containers", true, "fa-solid fa-box", "/containers")
+			@NavbarItem("Networks", false, "fa-solid fa-network-wired", "/networks")
+			@NavbarItem("Secrets", false, "fa-solid fa-key", "/secrets")
+			@NavbarItem("Stacks", false, "fa-solid fa-layer-group", "/stacks")
+			<hr class="border-gray-700"/>
 			if userRole == "admin" {
-				<div class="flex flex-col items-center w-full mt-2 border-t border-gray-700">
-					@NavbarItem("Users", false, "fa-solid fa-users", "/users")
-					@NavbarItem("Settings", false, "fa-solid fa-sliders", "/settings")
-				</div>
+				@NavbarItem("Users", false, "fa-solid fa-users", "/users")
+				@NavbarItem("Settings", false, "fa-solid fa-sliders", "/settings")
 			}
+			@NavbarItem("Logout", false, "fa-solid fa-right-from-bracket", "/logout")
+			@NavbarItem("Account", false, "fa-solid fa-user", "/account")
 		</div>
-		<div class="mt-auto"></div>
-		<a class="flex items-center w-full h-12 px-3 rounded hover:bg-gray-700 hover:text-gray-300" href="#">
-			@NavbarItemContent("Logout", "fa-solid fa-right-from-bracket")
-		</a>
-		<a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300" href="#">
-			@NavbarItemContent("Account", "fa-solid fa-user")
-		</a>
 	</div>
 	<!-- Component End  -->
 }

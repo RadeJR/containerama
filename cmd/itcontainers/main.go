@@ -51,10 +51,11 @@ func main() {
 	app.POST("/users", userHandler.CreateUser, middleware.ValidateSession, middleware.OnlyAdmin)
 	app.GET("/users/create", userHandler.CreateUserForm, middleware.ValidateSession, middleware.OnlyAdmin)
 
-	// HOME
+	// PAGES
 	pageHandler := handler.PageHandler{}
 	app.GET("/", pageHandler.ShowBase, middleware.ValidateSession)
-	app.GET("/home", pageHandler.ShowHome, middleware.ValidateSession)
+	app.GET("/containers", pageHandler.Containers, middleware.ValidateSession)
+	app.GET("/networks", pageHandler.Networks, middleware.ValidateSession)
 
 	app.Start(":3000")
 }
