@@ -1,0 +1,51 @@
+package user
+
+import "github.com/RadeJR/itcontainers/model"
+import "github.com/RadeJR/itcontainers/view/component"
+import "strconv"
+
+templ UserPage(users []model.User, count int64) {
+	<div class="mx-auto max-w-screen-lg px-4 py-8 sm:px-8">
+		<div class="flex items-center justify-between pb-6">
+			<div>
+				<h2 class="font-semibold text-gray-700">User Accounts</h2>
+				<span class="text-xs text-gray-500">View accounts of registered users</span>
+			</div>
+			<div class="flex items-center justify-between">
+				<div class="ml-10 space-x-8 lg:ml-40">
+					<button class="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring hover:bg-blue-700" hx-get="/users/create" hx-swap="innerHTML" hx-target="#content">
+						+
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="overflow-y-hidden rounded-lg border">
+			<div class="overflow-x-auto">
+				<table class="w-full">
+					<thead>
+						<tr class="bg-blue-600 text-left text-xs font-semibold uppercase tracking-widest text-white">
+							<th class="px-5 py-3">ID</th>
+							<th class="px-5 py-3">Username</th>
+							<th class="px-5 py-3">Full Name</th>
+							<th class="px-5 py-3">Email</th>
+							<th class="px-5 py-3">User Role</th>
+							<th class="px-5 py-3">Created at</th>
+						</tr>
+					</thead>
+					<tbody class="text-gray-500">
+						for _, user := range users {
+							@component.ShowUser(user)
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="flex flex-col items-center border-t bg-white px-5 py-5 sm:flex-row sm:justify-between">
+				<span class="text-xs text-gray-600 sm:text-sm">Showing 1 to 10 of { strconv.FormatInt(count, 10) } Entries </span>
+				<div class="mt-2 inline-flex sm:mt-0">
+					<button class="mr-2 h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Prev</button>
+					<button class="h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Next</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
