@@ -1,20 +1,10 @@
 package component
 
 templ NavbarItem(text string, active bool, iconClass string, route string) {
-	if active {
-		<a class="flex items-center w-full h-12 px-3 mt-2 rounded bg-gray-700 text-gray-300" hx-swap="innerHTML" hx-target="#content" hx-get={ route }>
-			@NavbarItemContent(text, iconClass)
-		</a>
-	} else {
-		<a class="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300" hx-swap="innerHTML" hx-target="#content" hx-get={ route }>
-			@NavbarItemContent(text, iconClass)
-		</a>
-	}
-}
-
-templ NavbarItemContent(text string, iconClass string) {
-	<i class={ iconClass }></i>
-	<span class="ml-2 text-sm font-medium">{ text }</span>
+	<a class={ "flex items-center w-full h-12 px-3 mt-2 rounded", templ.KV("bg-gray-700 text-gray-300", active), templ.KV("hover:bg-gray-700 hover:text-gray-300", !active) } hx-swap="innerHTML" hx-target="#content" hx-get={ route }>
+		<i class={ iconClass }></i>
+		<span class="ml-2 text-sm font-medium">{ text }</span>
+	</a>
 }
 
 templ Navbar(userRole string) {

@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/RadeJR/itcontainers/model"
-	"github.com/RadeJR/itcontainers/view/login"
+	"github.com/RadeJR/itcontainers/view/pages"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -16,7 +16,7 @@ type LoginHandler struct {
 }
 
 func (h LoginHandler) ShowLoginPage(c echo.Context) error {
-	return render(c, login.Show())
+	return render(c, pages.Login())
 }
 
 func (h LoginHandler) Login(c echo.Context) error {
