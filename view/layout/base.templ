@@ -11,7 +11,7 @@ templ Base(userRole string) {
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="https://kit.fontawesome.com/196b7ec421.js" crossorigin="anonymous"></script>
 		</head>
-		<body hx-get="/home" hx-trigger="load" hx-swap="innerHTML" hx-target="#content" class="flex">
+		<body hx-get="/containers" hx-trigger="load" hx-swap="innerHTML" hx-target="#content" class="flex">
 			@component.Navbar(userRole)
 			<div class="bg-gray-900 w-full">
 				<div id="content" class="rounded-l-lg h-full bg-gray-300"></div>

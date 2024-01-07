@@ -18,11 +18,8 @@ func (h PageHandler) ShowBase(c echo.Context) error {
 }
 
 func (h PageHandler) Containers(c echo.Context) error {
-	sess, err := session.Get("session", c)
-	if err != nil {
-		return c.String(500, "Server error")
-	}
-	return render(c, pages.Containers(sess.Values["role"].(string)))
+	cc := c.(CustomContext)
+	return render(c, pages.Containers(cc.Locals["role"].(string)))
 }
 
 func (h PageHandler) Networks(c echo.Context) error {

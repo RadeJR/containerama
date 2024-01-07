@@ -29,6 +29,8 @@ func main() {
 	// STATIC
 	app.Static("/", "assets")
 
+	app.Use(middleware.CreateLocals)
+
 	// session middleware
 	store := gormstore.New(db, []byte(os.Getenv("SESSION_SECRET")))
 	quit := make(chan struct{})

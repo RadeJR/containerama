@@ -27,9 +27,12 @@ templ Navbar(userRole string) {
 				@NavbarItem("Users", false, "fa-solid fa-users", "/users")
 				@NavbarItem("Settings", false, "fa-solid fa-sliders", "/settings")
 			}
-			@NavbarItem("Logout", false, "fa-solid fa-right-from-bracket", "/logout")
 			@NavbarItem("Account", false, "fa-solid fa-user", "/account")
 		</div>
+		<a class={ "flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 hover:text-gray-300 mt-auto" } href="/logout">
+			<i class="fa-solid fa-right-from-bracket"></i>
+			<span class="ml-2 text-sm font-medium">Logout</span>
+		</a>
 	</div>
 	<!-- Component End  -->
 }

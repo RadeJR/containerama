@@ -5,6 +5,7 @@ import (
 
 	"github.com/RadeJR/itcontainers/model"
 	"github.com/RadeJR/itcontainers/view/user"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -57,5 +58,9 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	var count int64
 	h.DB.Find(&users).Count(&count)
 	log.Println(count)
-	return render(c, user.UserPage(users, count))
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return c.String(500, "Server error")
+	}
+	return render(c, user.UserPage(users, count, sess.Values["role"].(string)))
 }
