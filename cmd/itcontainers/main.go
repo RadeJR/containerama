@@ -8,6 +8,7 @@ import (
 	"github.com/RadeJR/itcontainers/database"
 	"github.com/RadeJR/itcontainers/handler"
 	"github.com/RadeJR/itcontainers/middleware"
+	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -24,6 +25,13 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
+
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
+
+	defer cli.Close()
 
 	app := echo.New()
 	// STATIC
@@ -58,6 +66,12 @@ func main() {
 	app.GET("/", pageHandler.ShowBase, middleware.ValidateSession)
 	app.GET("/containers", pageHandler.Containers, middleware.ValidateSession)
 	app.GET("/networks", pageHandler.Networks, middleware.ValidateSession)
+
+	// CONTAINERS
+	dockerHandler := handler.DockerHandler{
+		Cli: cli,
+	}
+	app.GET("/containers", dockerHandler.GetContainers, middleware.ValidateSession)
 
 	app.Start(":3000")
 }
