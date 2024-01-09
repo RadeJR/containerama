@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
 	"time"
 
 	"github.com/RadeJR/itcontainers/view/containers"
@@ -40,5 +42,38 @@ func (h DockerHandler) StopContainer(c echo.Context) error {
 	}
 	time.Sleep(time.Second)
 
+	return c.Redirect(302, "/containers")
+}
+
+func (h DockerHandler) CreateContainerPage(c echo.Context) error {
+	return render(c, containers.ShowCreateForm())
+}
+
+func (h DockerHandler) CreateContainer(c echo.Context) error {
+	type ContainerData struct {
+		Image string `form:"image"`
+		Name  string `form:"name"`
+	}
+	var data ContainerData
+
+	c.Bind(&data)
+
+	ctx := context.Background()
+	reader, err := h.Cli.ImagePull(ctx, data.Image, types.ImagePullOptions{})
+	if err != nil {
+		return c.String(500, err.Error())
+	}
+	io.Copy(os.Stdout, reader)
+
+	resp, err := h.Cli.ContainerCreate(ctx, &container.Config{
+		Image: data.Image,
+	}, nil, nil, nil, data.Name)
+	if err != nil {
+		return c.String(500, err.Error())
+	}
+
+	if err := h.Cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+		return c.String(500, err.Error())
+	}
 	return c.Redirect(302, "/containers")
 }

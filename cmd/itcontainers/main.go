@@ -72,6 +72,8 @@ func main() {
 		Cli: cli,
 	}
 	app.GET("/containers", dockerHandler.GetContainers, middleware.ValidateSession)
+	app.GET("/containers/create", dockerHandler.CreateContainerPage, middleware.ValidateSession)
+	app.POST("/containers/create", dockerHandler.CreateContainer, middleware.ValidateSession)
 	app.GET("/containers/stop/:id", dockerHandler.StopContainer, middleware.ValidateSession)
 
 	app.Start(":3000")
