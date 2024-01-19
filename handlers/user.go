@@ -1,10 +1,10 @@
-package handler
+package handlers
 
 import (
 	"log"
 
-	"github.com/RadeJR/itcontainers/model"
-	"github.com/RadeJR/itcontainers/view/user"
+	"github.com/RadeJR/itcontainers/components"
+	"github.com/RadeJR/itcontainers/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -31,7 +31,7 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		return c.String(500, "Server error")
 	}
 
-	user := model.User{
+	user := models.User{
 		Username:     data.Username,
 		PasswordHash: string(hashedPassword),
 		FirstName:    data.FirstName,
@@ -49,11 +49,11 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 }
 
 func (h UserHandler) CreateUserForm(c echo.Context) error {
-	return render(c, user.CreateUserForm())
+	return render(c, components.CreateUserForm())
 }
 
 func (h UserHandler) ShowUsers(c echo.Context) error {
-	users := []model.User{}
+	users := []models.User{}
 	h.DB.Limit(10).Find(&users)
 	var count int64
 	h.DB.Find(&users).Count(&count)
@@ -62,5 +62,5 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Server error")
 	}
-	return render(c, user.UserPage(users, count, sess.Values["role"].(string)))
+	return render(c, components.UserPage(users, count, sess.Values["role"].(string)))
 }

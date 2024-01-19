@@ -1,10 +1,10 @@
-package handler
+package handlers
 
 import (
 	"errors"
 
-	"github.com/RadeJR/itcontainers/model"
-	"github.com/RadeJR/itcontainers/view/pages"
+	"github.com/RadeJR/itcontainers/components"
+	"github.com/RadeJR/itcontainers/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -16,7 +16,7 @@ type LoginHandler struct {
 }
 
 func (h LoginHandler) ShowLoginPage(c echo.Context) error {
-	return render(c, pages.Login())
+	return render(c, components.Login())
 }
 
 func (h LoginHandler) Login(c echo.Context) error {
@@ -36,7 +36,7 @@ func (h LoginHandler) Login(c echo.Context) error {
 	var data formData
 	c.Bind(&data)
 
-	user := model.User{}
+	user := models.User{}
 
 	err = h.DB.Where("username = ?", data.Username).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {

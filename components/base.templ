@@ -1,6 +1,4 @@
-package layout
-
-import "github.com/RadeJR/itcontainers/view/component"
+package components
 
 templ Base(userRole string) {
 	<html>
@@ -12,7 +10,7 @@ templ Base(userRole string) {
 			<script src="https://kit.fontawesome.com/196b7ec421.js" crossorigin="anonymous"></script>
 		</head>
 		<body class="flex">
-			@component.Navbar(userRole)
+			@Navbar(userRole)
 			<div class="bg-gray-900 w-full">
 				<div id="content" class="flex rounded-l-lg h-full bg-gray-300"></div>
 			</div>

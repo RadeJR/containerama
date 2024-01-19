@@ -1,4 +1,4 @@
-package model
+package models
 
 type NavItem struct {
 	Name  string

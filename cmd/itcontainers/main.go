@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/RadeJR/itcontainers/database"
-	"github.com/RadeJR/itcontainers/handler"
+	"github.com/RadeJR/itcontainers/db"
+	"github.com/RadeJR/itcontainers/handlers"
 	"github.com/RadeJR/itcontainers/middleware"
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
@@ -21,7 +21,7 @@ func main() {
 		log.Fatal("Failed to load env")
 	}
 
-	db, err := database.InitializeDB()
+	db, err := db.InitializeDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
@@ -46,7 +46,7 @@ func main() {
 	app.Use(session.Middleware(store))
 
 	// LOGIN
-	loginHandler := handler.LoginHandler{
+	loginHandler := handlers.LoginHandler{
 		DB: db,
 	}
 	app.GET("/login", loginHandler.ShowLoginPage)
@@ -54,7 +54,7 @@ func main() {
 	app.GET("/logout", loginHandler.Logout)
 
 	// USER
-	userHandler := handler.UserHandler{
+	userHandler := handlers.UserHandler{
 		DB: db,
 	}
 	app.GET("/users", userHandler.ShowUsers, middleware.ValidateSession, middleware.OnlyAdmin)
@@ -62,19 +62,22 @@ func main() {
 	app.GET("/users/create", userHandler.CreateUserForm, middleware.ValidateSession, middleware.OnlyAdmin)
 
 	// PAGES
-	pageHandler := handler.PageHandler{}
+	pageHandler := handlers.PageHandler{}
 	app.GET("/", pageHandler.ShowBase, middleware.ValidateSession)
 	app.GET("/containers", pageHandler.Containers, middleware.ValidateSession)
 	app.GET("/networks", pageHandler.Networks, middleware.ValidateSession)
 
 	// CONTAINERS
-	dockerHandler := handler.DockerHandler{
+	dockerHandler := handlers.DockerHandler{
 		Cli: cli,
 	}
 	app.GET("/containers", dockerHandler.GetContainers, middleware.ValidateSession)
 	app.GET("/containers/create", dockerHandler.CreateContainerPage, middleware.ValidateSession)
 	app.POST("/containers/create", dockerHandler.CreateContainer, middleware.ValidateSession)
 	app.GET("/containers/stop/:id", dockerHandler.StopContainer, middleware.ValidateSession)
+	app.GET("/containers/start/:id", dockerHandler.StartContainer, middleware.ValidateSession)
+	app.GET("/containers/restart/:id", dockerHandler.RestartContainer, middleware.ValidateSession)
+	app.GET("/containers/remove/:id", dockerHandler.RemoveContainer, middleware.ValidateSession)
 
 	app.Start(":3000")
 }

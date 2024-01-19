@@ -1,17 +1,16 @@
-package pages
+package components
 
-import "github.com/RadeJR/itcontainers/view/component"
-import "github.com/RadeJR/itcontainers/model"
+import "github.com/RadeJR/itcontainers/models"
 
 templ Containers(userRole string) {
 	<div id="navbar-items" class="w-full px-2" hx-swap-oob="true">
 		<hr class="border-gray-700"/>
-		for _, navitem := range model.NavItems {
+		for _, navitem := range models.NavItems {
 			if containsString(userRole, navitem.Roles) {
 				if navitem.Name == "Containers" {
-					@component.NavbarItem(navitem.Name, true, navitem.Icon, navitem.Route)
+					@NavbarItem(navitem.Name, true, navitem.Icon, navitem.Route)
 				} else {
-					@component.NavbarItem(navitem.Name, false, navitem.Icon, navitem.Route)
+					@NavbarItem(navitem.Name, false, navitem.Icon, navitem.Route)
 				}
 			}
 		}
@@ -34,12 +33,12 @@ func containsString(s string, strings []string) bool {
 templ Networks(userRole string) {
 	<div id="navbar-items" class="w-full px-2" hx-swap-oob="true">
 		<hr class="border-gray-700"/>
-		for _, navitem := range model.NavItems {
+		for _, navitem := range models.NavItems {
 			if containsString(userRole, navitem.Roles) {
 				if navitem.Name == "Networks" {
-					@component.NavbarItem(navitem.Name, true, navitem.Icon, navitem.Route)
+					@NavbarItem(navitem.Name, true, navitem.Icon, navitem.Route)
 				} else {
-					@component.NavbarItem(navitem.Name, false, navitem.Icon, navitem.Route)
+					@NavbarItem(navitem.Name, false, navitem.Icon, navitem.Route)
 				}
 			}
 		}
@@ -50,12 +49,12 @@ templ Networks(userRole string) {
 templ Users(userRole string) {
 	<div id="navbar-items" class="w-full px-2" hx-swap-oob="true">
 		<hr class="border-gray-700"/>
-		for _, navitem := range model.NavItems {
+		for _, navitem := range models.NavItems {
 			if containsString(userRole, navitem.Roles) {
 				if navitem.Name == "Users" {
-					@component.NavbarItem(navitem.Name, true, navitem.Icon, navitem.Route)
+					@NavbarItem(navitem.Name, true, navitem.Icon, navitem.Route)
 				} else {
-					@component.NavbarItem(navitem.Name, false, navitem.Icon, navitem.Route)
+					@NavbarItem(navitem.Name, false, navitem.Icon, navitem.Route)
 				}
 			}
 		}

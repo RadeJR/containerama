@@ -1,11 +1,11 @@
-package component
+package components
 
 import (
-	"github.com/RadeJR/itcontainers/model"
+	"github.com/RadeJR/itcontainers/models"
 	"fmt"
 )
 
-templ ShowUser(user model.User) {
+templ ShowUser(user models.User) {
 	<tr>
 		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
 			<p class="whitespace-no-wrap">{ fmt.Sprint(user.ID) }</p>

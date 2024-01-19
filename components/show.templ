@@ -1,12 +1,10 @@
-package user
+package components
 
-import "github.com/RadeJR/itcontainers/model"
-import "github.com/RadeJR/itcontainers/view/component"
+import "github.com/RadeJR/itcontainers/models"
 import "strconv"
-import "github.com/RadeJR/itcontainers/view/pages"
 
-templ UserPage(users []model.User, count int64, userRole string) {
-	@pages.Users(userRole) {
+templ UserPage(users []models.User, count int64, userRole string) {
+	@Users(userRole) {
 		<div class="mx-auto max-w-screen-lg px-4 py-8 sm:px-8">
 			<div class="flex items-center justify-between pb-6">
 				<div>
@@ -34,7 +32,7 @@ templ UserPage(users []model.User, count int64, userRole string) {
 						</thead>
 						<tbody class="text-gray-500">
 							for _, user := range users {
-								@component.ShowUser(user)
+								@ShowUser(user)
 							}
 						</tbody>
 					</table>
