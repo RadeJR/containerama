@@ -16,11 +16,6 @@ func (h PageHandler) ShowBase(c echo.Context) error {
 	return render(c, components.Base(sess.Values["role"].(string)))
 }
 
-func (h PageHandler) Containers(c echo.Context) error {
-	cc := c.(CustomContext)
-	return render(c, components.Containers(cc.Locals["role"].(string)))
-}
-
 func (h PageHandler) Networks(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {

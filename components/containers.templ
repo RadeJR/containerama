@@ -44,21 +44,24 @@ templ ShowContainerPage(container types.ContainerJSON) {
 
 templ ContainersPage (containers []types.Container, userRole string) {
 	@Containers(userRole) {
-		<div class="mx-auto px-4 py-8 sm:px-8">
+		<div class="py-8 px-8">
 			<div class="flex items-center justify-between pb-6">
 				<div>
 					<h2 class="font-semibold text-gray-700">Containers</h2>
 					<span class="text-xs text-gray-500">View containers</span>
 				</div>
-				<div class="ml-10 space-x-8 lg:ml-40">
-					<button class="flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring hover:bg-blue-700" hx-get="/containers/create" hx-swap="innerHTML" hx-target="#content">
-						+
-					</button>
-				</div>
+				<button
+					class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+					hx-get="/containers/create"
+					hx-swap="innerHTML"
+					hx-target="#content"
+				>
+					+
+				</button>
 			</div>
-			<div class="overflow-y-hidden rounded-lg border">
+			<div class="w-full overflow-y-hidden rounded-lg">
 				<div class="overflow-x-auto">
-					<table class="w-full">
+					<table class="table-auto">
 						<thead>
 							<tr class="bg-gray-900 text-left text-xs font-semibold uppercase tracking-widest text-white">
 								<th class="px-5 py-3">ID</th>

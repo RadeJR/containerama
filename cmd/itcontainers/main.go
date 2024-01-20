@@ -48,25 +48,35 @@ func main() {
 
 	// USER
 	userHandler := handlers.UserHandler{}
-	app.GET("/users", userHandler.ShowUsers, middleware.ValidateSession, middleware.OnlyAdmin)
-	app.POST("/users", userHandler.CreateUser, middleware.ValidateSession, middleware.OnlyAdmin)
-	app.GET("/users/create", userHandler.CreateUserForm, middleware.ValidateSession, middleware.OnlyAdmin)
+	users := app.Group("/users", middleware.ValidateSession, middleware.OnlyAdmin)
+	users.GET("", userHandler.ShowUsers)
+	users.POST("", userHandler.CreateUser)
+	users.GET("/create", userHandler.CreateUserForm)
 
 	// PAGES
 	pageHandler := handlers.PageHandler{}
 	app.GET("/", pageHandler.ShowBase, middleware.ValidateSession)
-	app.GET("/containers", pageHandler.Containers, middleware.ValidateSession)
 	app.GET("/networks", pageHandler.Networks, middleware.ValidateSession)
 
-	// CONTAINERS
+	// DOCKER
 	dockerHandler := handlers.DockerHandler{}
-	app.GET("/containers", dockerHandler.GetContainers, middleware.ValidateSession)
-	app.GET("/containers/create", dockerHandler.CreateContainerPage, middleware.ValidateSession)
-	app.POST("/containers/create", dockerHandler.CreateContainer, middleware.ValidateSession)
-	app.GET("/containers/stop/:id", dockerHandler.StopContainer, middleware.ValidateSession)
-	app.GET("/containers/start/:id", dockerHandler.StartContainer, middleware.ValidateSession)
-	app.GET("/containers/restart/:id", dockerHandler.RestartContainer, middleware.ValidateSession)
-	app.GET("/containers/remove/:id", dockerHandler.RemoveContainer, middleware.ValidateSession)
+	// CONTAINERS
+	containers := app.Group("/containers", middleware.ValidateSession)
+	containers.GET("", dockerHandler.GetContainers, middleware.ValidateSession)
+	containers.GET("/create", dockerHandler.CreateContainerPage)
+	containers.POST("/create", dockerHandler.CreateContainer)
+	containers.GET("/stop/:id", dockerHandler.StopContainer)
+	containers.GET("/start/:id", dockerHandler.StartContainer)
+	containers.GET("/restart/:id", dockerHandler.RestartContainer)
+	containers.GET("/remove/:id", dockerHandler.RemoveContainer)
+	containers.GET(":id", dockerHandler.ShowContainer)
+	// NETWORKS
+	// networks := app.Group("/networks", middleware.ValidateSession)
+	// networks.GET("", dockerHandler.GetNetworks, middleware.ValidateSession)
+	// networks.GET("/create", dockerHandler.CreateNetworkPage)
+	// networks.POST("/create", dockerHandler.CreateNetwork)
+	// networks.GET("/remove/:id", dockerHandler.RemoveNetwork)
+	// networks.GET(":id", dockerHandler.ShowNetwork)
 
 	app.Start(":3000")
 }
