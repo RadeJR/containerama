@@ -9,10 +9,11 @@ templ Base(userRole string) {
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="https://kit.fontawesome.com/196b7ec421.js" crossorigin="anonymous"></script>
 		</head>
-		<body class="flex">
+		<body class="bg-gray-900">
+			<div id="popup"></div>
 			@Navbar(userRole)
-			<div class="bg-gray-900 w-full">
-				<div id="content" class="flex rounded-l-lg h-full bg-gray-300"></div>
+			<div id="content" class="ml-48 rounded-l-lg bg-gray-300 min-h-screen">
+				{ children... }
 			</div>
 		</body>
 	</html>

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/RadeJR/itcontainers/components"
+	"github.com/RadeJR/itcontainers/db"
 	"github.com/RadeJR/itcontainers/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -11,9 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type LoginHandler struct {
-	DB *gorm.DB
-}
+type LoginHandler struct{}
 
 func (h LoginHandler) ShowLoginPage(c echo.Context) error {
 	return render(c, components.Login())
@@ -38,7 +37,7 @@ func (h LoginHandler) Login(c echo.Context) error {
 
 	user := models.User{}
 
-	err = h.DB.Where("username = ?", data.Username).First(&user).Error
+	err = db.DB.Where("username = ?", data.Username).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return c.String(504, "Wrong username or password")
 	}

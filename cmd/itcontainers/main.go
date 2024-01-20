@@ -8,31 +8,26 @@ import (
 	"github.com/RadeJR/itcontainers/db"
 	"github.com/RadeJR/itcontainers/handlers"
 	"github.com/RadeJR/itcontainers/middleware"
-	"github.com/docker/docker/client"
+	"github.com/RadeJR/itcontainers/services"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/wader/gormstore/v2"
 )
 
-func main() {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Failed to load env")
 	}
 
-	db, err := db.InitializeDB()
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
-	}
+	db.InitializeDB()
 
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		panic(err)
-	}
+	services.InitializeCient()
+	defer services.Cli.Close()
+}
 
-	defer cli.Close()
-
+func main() {
 	app := echo.New()
 	// STATIC
 	app.Static("/", "assets")
@@ -40,23 +35,19 @@ func main() {
 	app.Use(middleware.CreateLocals)
 
 	// session middleware
-	store := gormstore.New(db, []byte(os.Getenv("SESSION_SECRET")))
+	store := gormstore.New(db.DB, []byte(os.Getenv("SESSION_SECRET")))
 	quit := make(chan struct{})
 	go store.PeriodicCleanup(1*time.Hour, quit)
 	app.Use(session.Middleware(store))
 
 	// LOGIN
-	loginHandler := handlers.LoginHandler{
-		DB: db,
-	}
+	loginHandler := handlers.LoginHandler{}
 	app.GET("/login", loginHandler.ShowLoginPage)
 	app.POST("/login", loginHandler.Login)
 	app.GET("/logout", loginHandler.Logout)
 
 	// USER
-	userHandler := handlers.UserHandler{
-		DB: db,
-	}
+	userHandler := handlers.UserHandler{}
 	app.GET("/users", userHandler.ShowUsers, middleware.ValidateSession, middleware.OnlyAdmin)
 	app.POST("/users", userHandler.CreateUser, middleware.ValidateSession, middleware.OnlyAdmin)
 	app.GET("/users/create", userHandler.CreateUserForm, middleware.ValidateSession, middleware.OnlyAdmin)
@@ -68,9 +59,7 @@ func main() {
 	app.GET("/networks", pageHandler.Networks, middleware.ValidateSession)
 
 	// CONTAINERS
-	dockerHandler := handlers.DockerHandler{
-		Cli: cli,
-	}
+	dockerHandler := handlers.DockerHandler{}
 	app.GET("/containers", dockerHandler.GetContainers, middleware.ValidateSession)
 	app.GET("/containers/create", dockerHandler.CreateContainerPage, middleware.ValidateSession)
 	app.POST("/containers/create", dockerHandler.CreateContainer, middleware.ValidateSession)

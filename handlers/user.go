@@ -4,16 +4,14 @@ import (
 	"log"
 
 	"github.com/RadeJR/itcontainers/components"
+	"github.com/RadeJR/itcontainers/db"
 	"github.com/RadeJR/itcontainers/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
-type UserHandler struct {
-	DB *gorm.DB
-}
+type UserHandler struct{}
 
 func (h UserHandler) CreateUser(c echo.Context) error {
 	type userData struct {
@@ -40,7 +38,7 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		Email:        data.Email,
 	}
 
-	if err := h.DB.Create(&user).Error; err != nil {
+	if err := db.DB.Create(&user).Error; err != nil {
 		log.Println(err)
 		return c.String(500, "Server error")
 	}
@@ -54,9 +52,9 @@ func (h UserHandler) CreateUserForm(c echo.Context) error {
 
 func (h UserHandler) ShowUsers(c echo.Context) error {
 	users := []models.User{}
-	h.DB.Limit(10).Find(&users)
+	db.DB.Limit(10).Find(&users)
 	var count int64
-	h.DB.Find(&users).Count(&count)
+	db.DB.Find(&users).Count(&count)
 	log.Println(count)
 	sess, err := session.Get("session", c)
 	if err != nil {

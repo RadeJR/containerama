@@ -8,16 +8,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Failed to load env")
 	}
+	db.InitializeDB()
+}
 
-	db, err := db.InitializeDB()
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
-	}
-
-	db.AutoMigrate(&models.User{})
+func main() {
+	db.DB.AutoMigrate(&models.User{})
 }
