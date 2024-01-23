@@ -11,18 +11,21 @@ type DockerHandler struct{}
 func (h DockerHandler) GetContainers(c echo.Context) error {
 	cont, err := services.GetContainers()
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		return render(c, components.ErrorPopup(err))
 	}
-
-	return render(c, components.ContainersPage(cont, c.(CustomContext).Locals["role"].(string)))
+	if c.Request().Header.Get("HX-Request") != "true" {
+		return render(c, components.ContainersPageFull(cont, c.(CustomContext).Locals["role"].(string)))
+	} else {
+		return render(c, components.ContainersPage(cont, c.(CustomContext).Locals["role"].(string)))
+	}
 }
 
 func (h DockerHandler) StopContainer(c echo.Context) error {
 	err := services.StopContainer(c.Param("id"))
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		render(c, components.ErrorPopup(err))
 	}
-	return c.Redirect(302, "/containers")
+	return h.GetContainers(c)
 }
 
 func (h DockerHandler) CreateContainerPage(c echo.Context) error {
@@ -31,45 +34,45 @@ func (h DockerHandler) CreateContainerPage(c echo.Context) error {
 
 func (h DockerHandler) CreateContainer(c echo.Context) error {
 	var data services.ContainerData
-
 	c.Bind(&data)
 
 	err := services.CreateContainer(data)
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		render(c, components.ErrorPopup(err))
+		return h.CreateContainerPage(c)
 	}
-
-	return c.Redirect(302, "/containers")
+	return h.GetContainers(c)
 }
 
 func (h DockerHandler) StartContainer(c echo.Context) error {
 	err := services.StartContainer(c.Param("id"))
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		render(c, components.ErrorPopup(err))
 	}
-	return c.Redirect(302, "/containers")
+	return h.GetContainers(c)
 }
 
 func (h DockerHandler) RestartContainer(c echo.Context) error {
 	err := services.RestartContainer(c.Param("id"))
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		render(c, components.ErrorPopup(err))
 	}
-	return c.Redirect(302, "/containers")
+	return h.GetContainers(c)
 }
 
 func (h DockerHandler) RemoveContainer(c echo.Context) error {
-	err := services.RemoveContainer(c.Param("id"))
+	err := services.RemoveContainer(c.Param("id"), false)
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		render(c, components.ErrorPopup(err))
 	}
-	return c.Redirect(302, "/containers")
+	return h.GetContainers(c)
 }
 
 func (h DockerHandler) ShowContainer(c echo.Context) error {
 	cont, err := services.GetContainer(c.Param("id"))
 	if err != nil {
-		return render(c, components.ErrorPopup(err.Error()))
+		render(c, components.ErrorPopup(err))
+		return h.ShowContainer(c)
 	}
 	return render(c, components.ShowContainerPage(cont))
 }

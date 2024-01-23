@@ -4,18 +4,27 @@ import (
 	"context"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
 )
 
 var Cli *client.Client
 
 type ContainerData struct {
-	Image string `form:"image"`
-	Name  string `form:"name"`
+	Image           string `form:"image"`
+	Name            string `form:"name"`
+	Env             string `form:"env"`
+	Cmd             string `form:"cmd"`
+	Ports           string `form:"exposedPorts"`
+	Volumes         string `form:"volumes"`
+	Entrypoint      string `form:"entrypoint"`
+	Labels          string `form:"labels"`
+	NetworkDisabled bool   `form:"networkDisabled"`
 }
 
 func InitializeCient() error {
@@ -61,10 +70,34 @@ func CreateContainer(data ContainerData) error {
 	}
 	io.Copy(os.Stdout, reader)
 
-	resp, err := Cli.ContainerCreate(ctx, &container.Config{
-		Image: data.Image,
-	}, nil, nil, nil, data.Name)
+	_, ports, err := nat.ParsePortSpecs(strings.Split(data.Ports, "\n"))
 	if err != nil {
+		return err
+	}
+
+	entrypoint := strings.Split(data.Entrypoint, " ")
+	if entrypoint[0] == "" {
+		entrypoint = nil
+	}
+
+	cmd := strings.Split(data.Cmd, " ")
+	if cmd[0] == "" {
+		cmd = nil
+	}
+
+	resp, err := Cli.ContainerCreate(ctx, &container.Config{
+		Image:           data.Image,
+		Env:             strings.Split(data.Env, "\n"),
+		Cmd:             cmd,
+		Entrypoint:      entrypoint,
+		Labels:          parseLabelString(data.Labels),
+		NetworkDisabled: data.NetworkDisabled,
+	}, &container.HostConfig{
+		Binds:        strings.Split(data.Volumes, "\n"),
+		PortBindings: ports,
+	}, nil, nil, data.Name)
+	if err != nil {
+		RemoveContainer(resp.ID, true)
 		return err
 	}
 
@@ -91,11 +124,14 @@ func RestartContainer(id string) error {
 }
 
 // function that deletes the container
-func RemoveContainer(id string) error {
-	if err := Cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{}); err != nil {
+func RemoveContainer(id string, force bool) error {
+	statusCh, errCh := Cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
+	if err := Cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{
+		Force: force,
+	}); err != nil {
 		return err
 	}
-	statusCh, errCh := Cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
+
 	select {
 	case err := <-errCh:
 		if err != nil {
