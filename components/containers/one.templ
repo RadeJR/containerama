@@ -1,0 +1,7 @@
+package containers
+
+import "github.com/docker/docker/api/types"
+
+templ One(container types.ContainerJSON) {
+	{ container.State.Status }
+}

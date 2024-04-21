@@ -11,3 +11,6 @@ build:
 
 watch:
 	@CompileDaemon -command="./main" -exclude-dir=.git -build="make build" -exclude="*_templ.go" -include="*.templ"
+
+database:
+	@docker compose up -d

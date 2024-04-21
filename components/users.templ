@@ -69,7 +69,7 @@ templ CreateUserForm() {
 }
 
 templ UserPage(users []models.User, count int64, userRole string) {
-	@Users(userRole) {
+	<div hx-swap-oob="true" id="content" class="ml-48 rounded-l-lg bg-gray-300 min-h-screen pt-5">
 		<div class="px-4 py-8">
 			<div class="flex items-center justify-between pb-6">
 				<div>
@@ -114,5 +114,5 @@ templ UserPage(users []models.User, count int64, userRole string) {
 				</div>
 			</div>
 		</div>
-	}
+	</div>
 }

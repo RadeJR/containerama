@@ -1,0 +1,69 @@
+package containers
+
+import "github.com/docker/docker/api/types"
+
+
+templ Edit(cont types.ContainerJSON) {
+	<div class="mx-5 bg-gray-900 p-8 rounded-lg shadow">
+		<h2 class="text-2xl font-semibold text-gray-100 mb-6">Edit container</h2>
+		<form hx-post={ "/containers/edit/" + cont.ID } hx-target="#content" hx-swap="innerHTML" class="flex flex-col">
+			<div class="flex">
+				<!-- Name -->
+				<div class="mb-4 md:mr-5 flex-1">
+					<label for="name" class="block text-sm font-medium text-gray-100">Name</label>
+					<input type="text" id="name" name="name" class="mt-1 p-2 w-full border rounded-md" value={ cont.Name }/>
+				</div>
+				<!-- Image -->
+				<div class="mb-4 flex-1">
+					<label for="image" class="block text-sm font-medium text-gray-100">Image</label>
+					<input type="text" id="image" name="image" class="mt-1 p-2 w-full border rounded-md" value={ cont.Config.Image }/>
+				</div>
+			</div>
+			<!-- Environment Variables -->
+			<div class="mb-4">
+				<label for="env" class="block text-sm font-medium text-gray-100">Environment Variables</label>
+				<textarea
+					type="text"
+					id="env"
+					name="env"
+					class="mt-1 p-2 w-full border rounded-md"
+					value={ displayEnv(cont.Config.Env) }
+				></textarea>
+			</div>
+			<!-- Command -->
+			<div class="mb-4">
+				<label for="cmd" class="block text-sm font-medium text-gray-100">Command</label>
+				<input type="text" id="cmd" name="cmd" class="mt-1 p-2 w-full border rounded-md"/>
+			</div>
+			<!-- ExposedPorts -->
+			<div class="mb-4">
+				<label for="exposedPorts" class="block text-sm font-medium text-gray-100">Exposed Ports</label>
+				<textarea id="exposedPorts" name="exposedPorts" class="mt-1 p-2 w-full border rounded-md">{ displayPorts(cont.HostConfig.PortBindings) }</textarea>
+			</div>
+			<!-- Volumes -->
+			<div class="mb-4">
+				<label for="volumes" class="block text-sm font-medium text-gray-100">Volumes</label>
+				<input type="text" id="volumes" name="volumes" class="mt-1 p-2 w-full border rounded-md"/>
+			</div>
+			<!-- Entrypoint -->
+			<div class="mb-4">
+				<label for="entrypoint" class="block text-sm font-medium text-gray-100">Entrypoint</label>
+				<input type="text" id="entrypoint" name="entrypoint" class="mt-1 p-2 w-full border rounded-md"/>
+			</div>
+			<!-- Network Disabled -->
+			<div class="mb-4">
+				<label for="networkDisabled" class="block text-sm font-medium text-gray-100">Network Disabled</label>
+				<input type="checkbox" id="networkDisabled" name="networkDisabled" class="mt-1"/>
+			</div>
+			<!-- Labels -->
+			<div class="mb-6">
+				<label for="labels" class="block text-sm font-medium text-gray-100">Labels</label>
+				<textarea id="labels" name="labels" rows="4" class="mt-1 p-2 w-full border rounded-md"></textarea>
+			</div>
+			<!-- Submit Button -->
+			<button type="submit" class="w-full bg-blue-500 text-white p-3 rounded-md flex justify-around">
+				Create Docker Container 
+			</button>
+		</form>
+	</div>
+}

@@ -1,0 +1,98 @@
+package containers
+
+import (
+	"github.com/docker/docker/api/types"
+	"strconv"
+	"time"
+  "fmt"
+ 	"github.com/RadeJR/itcontainers/components"
+)
+
+templ Row(container types.Container) {
+	<tr>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<p class="whitespace-no-wrap">{ container.ID[:10] }</p>
+		</td>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<p class="whitespace-no-wrap">{ container.Image }</p>
+		</td>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<p class="whitespace-no-wrap">{ container.Names[0] }</p>
+		</td>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<p class="whitespace-no-wrap">
+				for i := 0; i<len(container.Ports); i++ {
+					{ strconv.FormatUint(uint64(container.Ports[i].PrivatePort),10) } { "->" } { strconv.FormatUint(uint64(container.Ports[i].PublicPort),10)+"; " }
+				}
+			</p>
+		</td>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<span class={ "rounded-full bg-green-200 px-3 py-1 text-xs font-semibold text-green-900", templ.KV("bg-red-300", container.State == "exited") }>{ container.State }</span>
+		</td>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<p class="whitespace-no-wrap">{ time.Unix(container.Created, 0).Format("02 Jan 06 15:04") }</p>
+		</td>
+		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+			<p class="whitespace-no-wrap flex justify-around">
+				<a class="cursor-pointer" hx-indicator="#htmx-indicator" hx-get={ "/containers/edit/" + container.ID } hx-swap="innerHTML" hx-target="#content"><i class="fa-solid fa-pen-to-square"></i></a>
+				if container.State == "exited" {
+					<a class="cursor-pointer" hx-indicator="#htmx-indicator" hx-get={ "/containers/start/" + container.ID } hx-swap="innerHTML" hx-target="#content"><i class="fa-solid fa-play"></i></a>
+				} else {
+					<a class="cursor-pointer" hx-indicator="#htmx-indicator" hx-get={ "/containers/stop/" + container.ID } hx-swap="innerHTML" hx-target="#content"><i class="fa-solid fa-stop"></i></a>
+				}
+				<a class="cursor-pointer" hx-indicator="#htmx-indicator" hx-get={ "/containers/remove/" + container.ID } hx-swap="innerHTML" hx-target="#content"><i class="fa-solid fa-xmark"></i></a>
+			</p>
+		</td>
+	</tr>
+}
+
+templ All (containers []types.Container) {
+  @components.Content() {
+			<div class="flex items-center justify-between pb-6">
+				<div>
+					<h2 class="font-semibold text-gray-700">Containers</h2>
+					<span class="text-xs text-gray-500">View containers</span>
+				</div>
+				<div id="htmx-indicator" class="htmx-indicator bg-gray-900 rounded-md p-4">
+					<img src="/oval.svg"/>
+				</div>
+				<button
+					class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+					hx-get="/containers/create"
+					hx-swap="innerHTML"
+					hx-target="#content"
+				>
+					+
+				</button>
+			</div>
+			<div class="w-full overflow-y-hidden rounded-lg">
+				<div class="overflow-x-auto">
+					<table class="table-auto w-full">
+						<thead>
+							<tr class="bg-gray-900 text-left text-xs font-semibold uppercase tracking-widest text-white">
+								<th class="px-5 py-3">ID</th>
+								<th class="px-5 py-3">Image</th>
+								<th class="px-5 py-3">Name</th>
+								<th class="px-5 py-3">Ports</th>
+								<th class="px-5 py-3">State</th>
+								<th class="px-5 py-3">Created at</th>
+								<th class="px-5 py-3">Controls</th>
+							</tr>
+						</thead>
+						<tbody class="text-gray-500">
+							for _, container := range containers {
+								@Row(container)
+							}
+						</tbody>
+					</table>
+				</div>
+				<div class="flex flex-col items-center border-t bg-white px-5 py-5 sm:flex-row sm:justify-between">
+					<span class="text-xs text-gray-600 sm:text-sm">Showing 1 to 10 of { fmt.Sprint(len(containers)) } Entries </span>
+					<div class="mt-2 inline-flex sm:mt-0">
+						<button class="mr-2 h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Prev</button>
+						<button class="h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Next</button>
+					</div>
+				</div>
+			</div>
+  }
+}

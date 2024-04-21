@@ -24,7 +24,7 @@ func init() {
 	db.InitializeDB()
 
 	services.InitializeCient()
-	defer services.Cli.Close()
+	defer services.CloseClient()
 }
 
 func main() {
@@ -53,16 +53,14 @@ func main() {
 	users.POST("", userHandler.CreateUser)
 	users.GET("/create", userHandler.CreateUserForm)
 
-	// PAGES
-	pageHandler := handlers.PageHandler{}
-	app.GET("/", pageHandler.ShowBase, middleware.ValidateSession)
-	app.GET("/networks", pageHandler.Networks, middleware.ValidateSession)
-
 	// DOCKER
 	dockerHandler := handlers.DockerHandler{}
+  // Containers is default page
+	app.GET("/", dockerHandler.GetContainers, middleware.ValidateSession)
+
 	// CONTAINERS
 	containers := app.Group("/containers", middleware.ValidateSession)
-	containers.GET("", dockerHandler.GetContainers, middleware.ValidateSession)
+	containers.GET("", dockerHandler.GetContainers)
 	containers.GET("/create", dockerHandler.CreateContainerPage)
 	containers.POST("/create", dockerHandler.CreateContainer)
 	containers.GET("/stop/:id", dockerHandler.StopContainer)
@@ -70,6 +68,8 @@ func main() {
 	containers.GET("/restart/:id", dockerHandler.RestartContainer)
 	containers.GET("/remove/:id", dockerHandler.RemoveContainer)
 	containers.GET(":id", dockerHandler.ShowContainer)
+	containers.GET("/edit/:id", dockerHandler.EditContainerPage)
+	containers.POST("/edit/:id", dockerHandler.EditContainer)
 	// NETWORKS
 	// networks := app.Group("/networks", middleware.ValidateSession)
 	// networks.GET("", dockerHandler.GetNetworks, middleware.ValidateSession)
