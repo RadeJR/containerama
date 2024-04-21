@@ -46,7 +46,7 @@ templ Row(container types.Container) {
 	</tr>
 }
 
-templ All (containers []types.Container) {
+templ List (containers []types.Container, page int, sizeOfPage int, containerCount int) {
   @components.Content() {
 			<div class="flex items-center justify-between pb-6">
 				<div>
@@ -87,10 +87,22 @@ templ All (containers []types.Container) {
 					</table>
 				</div>
 				<div class="flex flex-col items-center border-t bg-white px-5 py-5 sm:flex-row sm:justify-between">
-					<span class="text-xs text-gray-600 sm:text-sm">Showing 1 to 10 of { fmt.Sprint(len(containers)) } Entries </span>
+					<span class="text-xs text-gray-600 sm:text-sm">Showing { fmt.Sprint(sizeOfPage*(page-1)) } to { fmt.Sprint((sizeOfPage*(page-1))+sizeOfPage) } of { fmt.Sprint(containerCount) } Entries </span>
 					<div class="mt-2 inline-flex sm:mt-0">
-						<button class="mr-2 h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Prev</button>
-						<button class="h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Next</button>
+						<button class={"mr-2 h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150",templ.KV("hover:bg-gray-100", page != 1), templ.KV("bg-gray-200", page == 1)}
+            hx-get={"/containers?page="+fmt.Sprint(page-1) }
+            hx-push-url="true"
+            if page == 1 {
+              disabled
+            }
+            >Prev</button>
+						<button class={"h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150", templ.KV("hover:bg-gray-100", (sizeOfPage*(page-1))+sizeOfPage < containerCount), templ.KV("bg-gray-200", (sizeOfPage*(page-1))+sizeOfPage >= containerCount)}
+            hx-get={"/containers?page="+fmt.Sprint(page+1) }
+            hx-push-url="true"
+            if (sizeOfPage*(page-1))+sizeOfPage >= containerCount {
+              disabled
+            }
+            >Next</button>
 					</div>
 				</div>
 			</div>

@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"log"
+	"strconv"
+
 	"github.com/RadeJR/itcontainers/components"
 	"github.com/RadeJR/itcontainers/components/containers"
 	"github.com/RadeJR/itcontainers/services"
@@ -10,17 +13,41 @@ import (
 type DockerHandler struct{}
 
 func (h DockerHandler) GetContainers(c echo.Context) error {
+  pageString := c.QueryParam("page")
+  var pageNum int
+  if pageString != "" {
+    var err error
+    pageNum, err = strconv.Atoi(pageString)
+    if err != nil {
+      c.Response().Header().Set("HX-Retarget", "#popup")
+      return render(c, components.ErrorPopup(err, false))
+    }
+  } else {
+    pageNum = 1
+  }
+  sizeOfPageString := c.QueryParam("size")
+  var sizeOfPageNum int
+  if sizeOfPageString != "" {
+    var err error
+    sizeOfPageNum, err = strconv.Atoi(sizeOfPageString)
+    if err != nil {
+      c.Response().Header().Set("HX-Retarget", "#popup")
+      return render(c, components.ErrorPopup(err, false))
+    }
+  } else {
+    sizeOfPageNum = 10
+  }
 	cont, err := services.GetContainers()
 	if err != nil {
 		c.Response().Header().Set("HX-Retarget", "#popup")
 		return render(c, components.ErrorPopup(err, false))
 	}
 	if c.Request().Header.Get("HX-Request") != "true" {
-		return render(c, containers.PageFull(cont, c.(CustomContext).Locals["role"].(string)))
+		return render(c, containers.PageFull(cont[(pageNum-1)*sizeOfPageNum:(pageNum-1)*sizeOfPageNum+sizeOfPageNum], pageNum, sizeOfPageNum, len(cont), c.(CustomContext).Locals["role"].(string)))
 	} else {
     role := c.(CustomContext).Locals["role"].(string)
     render(c, components.Navbar(role, "Containers"))
-		return render(c, containers.All(cont))
+		return render(c, containers.List(cont[(pageNum-1)*sizeOfPageNum:(pageNum-1)*sizeOfPageNum+sizeOfPageNum], pageNum, sizeOfPageNum, len(cont)))
 	}
 }
 

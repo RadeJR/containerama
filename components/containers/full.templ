@@ -6,9 +6,9 @@ import (
 )
 
 
-templ PageFull(cont []types.Container, userRole string) {
+templ PageFull(cont []types.Container, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Base(userRole) {
     @components.Navbar(userRole, "Containers")
-		@All(cont)
+		@List(cont, page, sizeOfPage, containerCount)
 	 }
 }

@@ -2,7 +2,7 @@ package components
 
 templ ErrorPopup(err error, oob bool) {
 	<div
-		id="popup"
+		id="popup-message"
 		class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded fixed w-full z-10 flex justify-between"
 		role="alert"
 	>
@@ -13,17 +13,17 @@ templ ErrorPopup(err error, oob bool) {
 		<button type="button" onclick="closePopup()"><i class="fa-solid fa-xmark"></i></button>
 	</div>
   <script>
-    function closePopup() {
-      // Get a reference to the original div
-      var originalDiv = document.getElementById("popup");
+  function closePopup() {
+    // Get a reference to the original div
+    var originalDiv = document.getElementById("popup");
 
-      // Create a new div
-      var newDiv = document.createElement("div");
-      newDiv.id = "popup";
-      newDiv.innerHTML = "";
+    // Create a new div
+    var newDiv = document.createElement("div");
+    newDiv.id = "popup";
+    newDiv.innerHTML = "";
 
-      // Replace the original div with the new one
-      originalDiv.parentNode.replaceChild(newDiv, originalDiv);
-    }
+    // Replace the original div with the new one
+    originalDiv.parentNode.replaceChild(newDiv, originalDiv);
+  }
   </script>
 }
