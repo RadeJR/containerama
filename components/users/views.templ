@@ -1,0 +1,25 @@
+package users
+
+import (
+"github.com/RadeJR/itcontainers/models"
+"github.com/RadeJR/itcontainers/components"
+)
+
+var headers = []string{"ID", "Username", "Full Name", "Email", "Role", "Created at"}
+
+templ PageFull(users []models.User, page int, sizeOfPage int, containerCount int, userRole string) {
+	@components.Base(userRole) {
+    @components.Navbar(userRole, "Containers")
+		@Page(users, page, sizeOfPage, containerCount)
+	 }
+}
+
+templ Page(users []models.User, page int, sizeOfPage int, containerCount int) {
+  @components.Content("Users", "View Users") {
+    @components.Table(headers, page, sizeOfPage, containerCount) {
+      for _, user := range users {
+        @Row(user)
+      }
+    }
+  }
+}

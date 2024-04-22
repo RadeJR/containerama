@@ -1,33 +1,4 @@
-package components
-
-import (
-	"github.com/RadeJR/itcontainers/models"
-	"fmt"
-	"strconv"
-)
-
-templ ShowUser(user models.User) {
-	<tr>
-		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-			<p class="whitespace-no-wrap">{ fmt.Sprint(user.ID) }</p>
-		</td>
-		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-			<p class="whitespace-no-wrap">{ user.Username }</p>
-		</td>
-		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-			<p class="whitespace-no-wrap">{ user.FirstName + " " + user.LastName }</p>
-		</td>
-		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-			<p class="whitespace-no-wrap">{ user.Email }</p>
-		</td>
-		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-			<span class="rounded-full bg-green-200 px-3 py-1 text-xs font-semibold text-green-900">{ user.Role }</span>
-		</td>
-		<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-			<p class="whitespace-no-wrap">{ user.CreatedAt.Format("02 Jan 06 15:04 MST") }</p>
-		</td>
-	</tr>
-}
+package users
 
 templ CreateUserForm() {
 	<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -63,55 +34,6 @@ templ CreateUserForm() {
 					</div>
 					<button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Create user</button>
 				</form>
-			</div>
-		</div>
-	</div>
-}
-
-templ UserPage(users []models.User, count int64, userRole string) {
-	<div hx-swap-oob="true" id="content" class="ml-48 rounded-l-lg bg-gray-300 min-h-screen pt-5">
-		<div class="px-4 py-8">
-			<div class="flex items-center justify-between pb-6">
-				<div>
-					<h2 class="font-semibold text-gray-700">User Accounts</h2>
-					<span class="text-xs text-gray-500">View accounts of registered users</span>
-				</div>
-				<button
-					class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-					hx-get="/users/create"
-					hx-swap="innerHTML"
-					hx-target="#content"
-				>
-					+
-				</button>
-			</div>
-			<div class="overflow-y-hidden rounded-lg">
-				<div class="overflow-x-auto">
-					<table class="table-auto w-full">
-						<thead>
-							<tr class="bg-gray-900 text-left text-xs font-semibold uppercase tracking-widest text-white">
-								<th class="px-5 py-3">ID</th>
-								<th class="px-5 py-3">Username</th>
-								<th class="px-5 py-3">Full Name</th>
-								<th class="px-5 py-3">Email</th>
-								<th class="px-5 py-3">User Role</th>
-								<th class="px-5 py-3">Created at</th>
-							</tr>
-						</thead>
-						<tbody class="text-gray-500">
-							for _, user := range users {
-								@ShowUser(user)
-							}
-						</tbody>
-					</table>
-				</div>
-				<div class="flex flex-col items-center border-t bg-white px-5 py-5 sm:flex-row sm:justify-between">
-					<span class="text-xs text-gray-600 sm:text-sm">Showing 1 to 10 of { strconv.FormatInt(count, 10) } Entries </span>
-					<div class="mt-2 inline-flex sm:mt-0">
-						<button class="mr-2 h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Prev</button>
-						<button class="h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150 hover:bg-gray-100">Next</button>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>

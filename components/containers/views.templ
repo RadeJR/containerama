@@ -1,0 +1,25 @@
+package containers
+
+import (
+	"github.com/docker/docker/api/types"
+ 	"github.com/RadeJR/itcontainers/components"
+)
+
+var headers = []string{"ID", "Image", "Name", "Ports", "State", "Created at", "Controls"}
+
+templ PageFull(cont []types.Container, page int, sizeOfPage int, containerCount int, userRole string) {
+	@components.Base(userRole) {
+    @components.Navbar(userRole, "Containers")
+		@Page(cont, page, sizeOfPage, containerCount)
+	 }
+}
+
+templ Page(containers []types.Container, page int, sizeOfPage int, containerCount int) {
+  @components.Content("Containers", "View Containers") {
+    @components.Table(headers, page, sizeOfPage, containerCount) {
+      for _, container := range containers {
+        @Row(container)
+      }
+    }
+  }
+}
