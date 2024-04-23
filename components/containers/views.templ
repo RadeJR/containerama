@@ -15,7 +15,7 @@ templ PageFull(cont []types.Container, page int, sizeOfPage int, containerCount 
 }
 
 templ Page(containers []types.Container, page int, sizeOfPage int, containerCount int) {
-  @components.Content("Containers", "View Containers") {
+  @components.Content("Containers", "View Containers", "/containers/create") {
     @components.Table(headers, page, sizeOfPage, containerCount) {
       for _, container := range containers {
         @Row(container)

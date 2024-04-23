@@ -15,7 +15,7 @@ templ PageFull(users []models.User, page int, sizeOfPage int, containerCount int
 }
 
 templ Page(users []models.User, page int, sizeOfPage int, containerCount int) {
-  @components.Content("Users", "View Users") {
+  @components.Content("Users", "View Users", "/users/create") {
     @components.Table(headers, page, sizeOfPage, containerCount) {
       for _, user := range users {
         @Row(user)

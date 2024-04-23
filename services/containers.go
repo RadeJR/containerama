@@ -9,11 +9,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 )
 
-var cli *client.Client
 
 type ContainerData struct {
 	Image           string `form:"image"`
@@ -25,23 +23,6 @@ type ContainerData struct {
 	Entrypoint      string `form:"entrypoint"`
 	Labels          string `form:"labels"`
 	NetworkDisabled bool   `form:"networkDisabled"`
-}
-
-func InitializeCient() error {
-	var err error
-	cli, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func CloseClient() error {
-	err := cli.Close()
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func GetContainers() ([]types.Container, error) {

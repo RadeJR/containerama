@@ -1,6 +1,6 @@
 package components
 
-templ Content(name, desc string) {
+templ Content(name, desc, createUrl string) {
 	<div hx-swap-oob="true" id="content" class="ml-48 rounded-l-lg bg-gray-300 min-h-screen pt-5">
 		<div class="py-8 px-8">
 			<div class="flex items-center justify-between pb-6">
@@ -11,14 +11,16 @@ templ Content(name, desc string) {
 				<div id="htmx-indicator" class="htmx-indicator bg-gray-900 rounded-md p-4">
 					<img src="/oval.svg"/>
 				</div>
-				<button
-					class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-					hx-get="/containers/create"
-					hx-swap="innerHTML"
-					hx-target="#content"
-				>
-					+
-				</button>
+        if createUrl != "" {
+          <button
+            class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            hx-get={ createUrl }
+            hx-swap="innerHTML"
+            hx-target="#content"
+          >
+            +
+          </button>
+        }
 			</div>
       {children...}
 		</div>
