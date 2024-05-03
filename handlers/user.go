@@ -39,8 +39,13 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		Email:        data.Email,
 	}
 
-	if err := db.DB.Create(&user).Error; err != nil {
+	result, err := db.DB.Exec("INSERT INTO users (username, password_hash, first_name, last_name, role, email) VALUES (?, ?, ?, ?, ?, ?)", user.Username, user.PasswordHash, user.FirstName, user.LastName, user.Role, user.Email)
+	if err != nil {
 		log.Println(err)
+		return c.String(500, "Server error")
+	}
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
 		return c.String(500, "Server error")
 	}
 
@@ -81,9 +86,17 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	// Getting data
 	role := c.(CustomContext).Locals["role"].(string)
 	users := []models.User{}
-	db.DB.Limit(10).Find(&users)
+	err := db.DB.Select(&users, "SELECT * FROM users LIMIT 10")
+	if err != nil {
+		c.Response().Header().Set("HX-Retarget", "#popup")
+		return render(c, components.ErrorPopup(err, false))
+	}
 	var count int64
-	db.DB.Find(&users).Count(&count)
+	err = db.DB.Get(&count, "SELECT count(*) FROM users")
+	if err != nil {
+		c.Response().Header().Set("HX-Retarget", "#popup")
+		return render(c, components.ErrorPopup(err, false))
+	}
 
 	// Rendering response
 	if c.Request().Header.Get("HX-Request") != "true" {

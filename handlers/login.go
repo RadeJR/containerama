@@ -1,15 +1,12 @@
 package handlers
 
 import (
-	"errors"
-
 	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type LoginHandler struct{}
@@ -21,7 +18,7 @@ func (h LoginHandler) ShowLoginPage(c echo.Context) error {
 func (h LoginHandler) Login(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.String(500, "Server error")
+		return c.String(500, err.Error())
 	}
 
 	if !sess.IsNew {
@@ -37,12 +34,12 @@ func (h LoginHandler) Login(c echo.Context) error {
 
 	user := models.User{}
 
-	err = db.DB.Where("username = ?", data.Username).First(&user).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	err = db.DB.Get(&user, "SELECT * FROM users WHERE username = ?", data.Username)
+	if err != nil {
 		return c.String(504, "Wrong username or password")
 	}
 
-	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(data.Password)) != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(data.Password)); err != nil {
 		return c.String(504, "Wrong username or password")
 	}
 

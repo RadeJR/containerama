@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"time"
 
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/handlers"
@@ -12,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
-	"github.com/wader/gormstore/v2"
+	"github.com/michaeljs1990/sqlitestore"
 )
 
 func init() {
@@ -22,6 +21,7 @@ func init() {
 	}
 
 	db.InitializeDB()
+	defer db.CloseDB()
 
 	services.InitializeCient()
 	defer services.CloseClient()
@@ -35,9 +35,10 @@ func main() {
 	app.Use(middleware.CreateLocals)
 
 	// session middleware
-	store := gormstore.New(db.DB, []byte(os.Getenv("SESSION_SECRET")))
-	quit := make(chan struct{})
-	go store.PeriodicCleanup(1*time.Hour, quit)
+	store, err := sqlitestore.NewSqliteStore("./db.sqlite3", "sessions", "/", 3600, []byte(os.Getenv("SESSION_SECRET")))
+	if err != nil {
+		log.Fatal(err)
+	}
 	app.Use(session.Middleware(store))
 
 	// LOGIN
