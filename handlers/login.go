@@ -3,9 +3,9 @@ package handlers
 import (
 	"errors"
 
-	"github.com/RadeJR/itcontainers/components"
-	"github.com/RadeJR/itcontainers/db"
-	"github.com/RadeJR/itcontainers/models"
+	"github.com/RadeJR/containerama/components"
+	"github.com/RadeJR/containerama/db"
+	"github.com/RadeJR/containerama/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"

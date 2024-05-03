@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/RadeJR/itcontainers/db"
-	"github.com/RadeJR/itcontainers/handlers"
-	"github.com/RadeJR/itcontainers/middleware"
-	"github.com/RadeJR/itcontainers/services"
+	"github.com/RadeJR/containerama/db"
+	"github.com/RadeJR/containerama/handlers"
+	"github.com/RadeJR/containerama/middleware"
+	"github.com/RadeJR/containerama/services"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -55,7 +55,7 @@ func main() {
 
 	// DOCKER
 	dockerHandler := handlers.DockerHandler{}
-  // Containers is default page
+	// Containers is default page
 	app.GET("/", dockerHandler.GetContainers, middleware.ValidateSession)
 
 	// CONTAINERS

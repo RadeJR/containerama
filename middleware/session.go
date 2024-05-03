@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/RadeJR/itcontainers/handlers"
+	"github.com/RadeJR/containerama/handlers"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )

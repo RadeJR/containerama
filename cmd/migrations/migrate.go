@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/RadeJR/itcontainers/db"
-	"github.com/RadeJR/itcontainers/models"
+	"github.com/RadeJR/containerama/db"
+	"github.com/RadeJR/containerama/models"
 	"github.com/joho/godotenv"
 )
 

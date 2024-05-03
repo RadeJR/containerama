@@ -6,7 +6,7 @@ templ Login() {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>ITContainers</title>
+			<title>Containerama</title>
 			<!-- Include Tailwind CSS -->
 			<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
 		</head>
@@ -16,13 +16,26 @@ templ Login() {
 				<form method="post" action="/login">
 					<div class="mb-4">
 						<label for="username" class="block text-gray-600 text-sm font-medium mb-2">Username</label>
-						<input type="text" id="username" name="username" class="w-full border p-2 rounded focus:outline-none focus:border-blue-500"/>
+						<input
+							type="text"
+							id="username"
+							name="username"
+							class="w-full border p-2 rounded focus:outline-none focus:border-blue-500"
+						/>
 					</div>
 					<div class="mb-4">
 						<label for="password" class="block text-gray-600 text-sm font-medium mb-2">Password</label>
-						<input type="password" id="password" name="password" class="w-full border p-2 rounded focus:outline-none focus:border-blue-500"/>
+						<input
+							type="password"
+							id="password"
+							name="password"
+							class="w-full border p-2 rounded focus:outline-none focus:border-blue-500"
+						/>
 					</div>
-					<button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue">Login</button>
+					<button
+						type="submit"
+						class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue"
+					>Login</button>
 				</form>
 			</div>
 		</body>

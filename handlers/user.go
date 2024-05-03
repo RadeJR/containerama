@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"log"
-  "strconv"
-	"github.com/RadeJR/itcontainers/components"
-	compusers "github.com/RadeJR/itcontainers/components/users"
-	"github.com/RadeJR/itcontainers/db"
-	"github.com/RadeJR/itcontainers/models"
+	"strconv"
+
+	"github.com/RadeJR/containerama/components"
+	compusers "github.com/RadeJR/containerama/components/users"
+	"github.com/RadeJR/containerama/db"
+	"github.com/RadeJR/containerama/models"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -51,7 +52,7 @@ func (h UserHandler) CreateUserForm(c echo.Context) error {
 }
 
 func (h UserHandler) ShowUsers(c echo.Context) error {
-  // PARSING QueryParam
+	// PARSING QueryParam
 	pageString := c.QueryParam("page")
 	var pageNum int
 	if pageString != "" {
@@ -77,14 +78,14 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 		sizeOfPageNum = 10
 	}
 
-  // Getting data
-  role := c.(CustomContext).Locals["role"].(string)
+	// Getting data
+	role := c.(CustomContext).Locals["role"].(string)
 	users := []models.User{}
 	db.DB.Limit(10).Find(&users)
 	var count int64
 	db.DB.Find(&users).Count(&count)
 
-  // Rendering response
+	// Rendering response
 	if c.Request().Header.Get("HX-Request") != "true" {
 		return render(c, compusers.PageFull(users, pageNum, sizeOfPageNum, int(count), role))
 	} else {

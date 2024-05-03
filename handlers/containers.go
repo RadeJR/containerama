@@ -3,9 +3,9 @@ package handlers
 import (
 	"strconv"
 
-	"github.com/RadeJR/itcontainers/components"
-	"github.com/RadeJR/itcontainers/components/containers"
-	"github.com/RadeJR/itcontainers/services"
+	"github.com/RadeJR/containerama/components"
+	"github.com/RadeJR/containerama/components/containers"
+	"github.com/RadeJR/containerama/services"
 	"github.com/labstack/echo/v4"
 )
 
