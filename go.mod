@@ -1,6 +1,8 @@
 module github.com/RadeJR/containerama
 
-go 1.21.5
+go 1.22
+
+toolchain go1.22.2
 
 require (
 	github.com/a-h/templ v0.2.501
@@ -12,6 +14,7 @@ require (
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/michaeljs1990/sqlitestore v0.0.0-20210507162135-8585425bc864
+	github.com/sethvargo/go-password v0.3.0
 	golang.org/x/crypto v0.17.0
 )
 

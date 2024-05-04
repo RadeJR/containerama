@@ -21,13 +21,15 @@ func init() {
 	}
 
 	db.InitializeDB()
-	defer db.CloseDB()
 
 	services.InitializeCient()
 	defer services.CloseClient()
+
+	services.EnsureAdminUserExists()
 }
 
 func main() {
+	defer db.CloseDB()
 	app := echo.New()
 	// STATIC
 	app.Static("/", "assets")

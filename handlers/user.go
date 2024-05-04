@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"log"
 	"strconv"
 
@@ -34,9 +35,15 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		Username:     data.Username,
 		PasswordHash: string(hashedPassword),
 		FirstName:    data.FirstName,
-		LastName:     data.LastName,
-		Role:         data.Role,
-		Email:        data.Email,
+		LastName: sql.NullString{
+			Valid:  true,
+			String: data.LastName,
+		},
+		Role: data.Role,
+		Email: sql.NullString{
+			Valid:  true,
+			String: data.Email,
+		},
 	}
 
 	result, err := db.DB.Exec("INSERT INTO users (username, password_hash, first_name, last_name, role, email) VALUES (?, ?, ?, ?, ?, ?)", user.Username, user.PasswordHash, user.FirstName, user.LastName, user.Role, user.Email)
@@ -53,7 +60,7 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 }
 
 func (h UserHandler) CreateUserForm(c echo.Context) error {
-	return render(c, compusers.CreateUserForm())
+	return Render(c, 200, compusers.CreateUserForm())
 }
 
 func (h UserHandler) ShowUsers(c echo.Context) error {
@@ -65,7 +72,7 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 		pageNum, err = strconv.Atoi(pageString)
 		if err != nil {
 			c.Response().Header().Set("HX-Retarget", "#popup")
-			return render(c, components.ErrorPopup(err, false))
+			return Render(c, 500, components.ErrorPopup(err, false))
 		}
 	} else {
 		pageNum = 1
@@ -77,7 +84,7 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 		sizeOfPageNum, err = strconv.Atoi(sizeOfPageString)
 		if err != nil {
 			c.Response().Header().Set("HX-Retarget", "#popup")
-			return render(c, components.ErrorPopup(err, false))
+			return Render(c, 500, components.ErrorPopup(err, false))
 		}
 	} else {
 		sizeOfPageNum = 10
@@ -89,20 +96,20 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	err := db.DB.Select(&users, "SELECT * FROM users LIMIT 10")
 	if err != nil {
 		c.Response().Header().Set("HX-Retarget", "#popup")
-		return render(c, components.ErrorPopup(err, false))
+		return Render(c, 500, components.ErrorPopup(err, false))
 	}
 	var count int64
 	err = db.DB.Get(&count, "SELECT count(*) FROM users")
 	if err != nil {
 		c.Response().Header().Set("HX-Retarget", "#popup")
-		return render(c, components.ErrorPopup(err, false))
+		return Render(c, 500, components.ErrorPopup(err, false))
 	}
 
 	// Rendering response
 	if c.Request().Header.Get("HX-Request") != "true" {
-		return render(c, compusers.PageFull(users, pageNum, sizeOfPageNum, int(count), role))
+		return Render(c, 200, compusers.PageFull(users, pageNum, sizeOfPageNum, int(count), role))
 	} else {
-		render(c, components.Navbar(role, "Users"))
-		return render(c, compusers.Page(users, pageNum, sizeOfPageNum, int(count)))
+		Render(c, 200, components.Navbar(role, "Users"))
+		return Render(c, 200, compusers.Page(users, pageNum, sizeOfPageNum, int(count)))
 	}
 }

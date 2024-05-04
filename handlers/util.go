@@ -10,6 +10,8 @@ type CustomContext struct {
 	Locals map[string]interface{}
 }
 
-func render(c echo.Context, component templ.Component) error {
-	return component.Render(c.Request().Context(), c.Response())
+func Render(ctx echo.Context, statusCode int, t templ.Component) error {
+	ctx.Response().Writer.WriteHeader(statusCode)
+	ctx.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
+	return t.Render(ctx.Request().Context(), ctx.Response().Writer)
 }

@@ -2,12 +2,12 @@
 -- +goose StatementBegin
 CREATE TABLE users (
     id integer primary key autoincrement,
-    username text,
-    first_name text,
+    username text NOT NULL,
+    first_name text NOT NULL,
     last_name text,
     email text,
-    password_hash text,
-    role text,
+    password_hash text NOT NULL,
+    role text NOT NULL,
     created_at datetime default current_timestamp,
     updated_at datetime default current_timestamp
 );

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"log/slog"
+
 	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/models"
@@ -12,7 +14,7 @@ import (
 type LoginHandler struct{}
 
 func (h LoginHandler) ShowLoginPage(c echo.Context) error {
-	return render(c, components.Login())
+	return Render(c, 200, components.Login())
 }
 
 func (h LoginHandler) Login(c echo.Context) error {
@@ -36,6 +38,7 @@ func (h LoginHandler) Login(c echo.Context) error {
 
 	err = db.DB.Get(&user, "SELECT * FROM users WHERE username = ?", data.Username)
 	if err != nil {
+		slog.Error("Failed getting user from db", "username", data.Username, "error", err)
 		return c.String(504, "Wrong username or password")
 	}
 

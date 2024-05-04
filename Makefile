@@ -2,9 +2,6 @@ run:
 	@templ generate
 	@go run cmd/containerama/main.go
 
-migrate:
-	@go run cmd/migrations/migrate.go
-
 build:
 	@templ generate
 	@go build cmd/containerama/main.go
@@ -12,5 +9,8 @@ build:
 watch:
 	@CompileDaemon -command="./main" -exclude-dir=.git -build="make build" -exclude="*_templ.go" -include="*.templ"
 
-database:
-	@docker compose up -d
+migrate:
+	@goose -dir db/migrations sqlite3 ./db.sqlite3 up
+
+migrate-down:
+	@goose -dir db/migrations sqlite3 ./db.sqlite3 down
