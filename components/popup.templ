@@ -12,18 +12,4 @@ templ ErrorPopup(err error, oob bool) {
 		</div>
 		<button type="button" onclick="closePopup()"><i class="fa-solid fa-xmark"></i></button>
 	</div>
-  <script>
-  function closePopup() {
-    // Get a reference to the original div
-    var originalDiv = document.getElementById("popup");
-
-    // Create a new div
-    var newDiv = document.createElement("div");
-    newDiv.id = "popup";
-    newDiv.innerHTML = "";
-
-    // Replace the original div with the new one
-    originalDiv.parentNode.replaceChild(newDiv, originalDiv);
-  }
-  </script>
 }

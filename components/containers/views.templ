@@ -9,12 +9,12 @@ var headers = []string{"ID", "Image", "Name", "Ports", "State", "Created at", "C
 
 templ PageFull(cont []types.Container, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Base(userRole) {
-		@components.Navbar(userRole, "Containers")
-		@Page(cont, page, sizeOfPage, containerCount)
+		@Page(cont, page, sizeOfPage, containerCount, userRole)
 	}
 }
 
-templ Page(containers []types.Container, page int, sizeOfPage int, containerCount int) {
+templ Page(containers []types.Container, page int, sizeOfPage int, containerCount int, role string) {
+	@components.Navbar(role, "Containers")
 	@components.Content("Containers", "View Containers", "/containers/create") {
 		@components.Table(headers, page, sizeOfPage, containerCount) {
 			for _, container := range containers {

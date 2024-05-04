@@ -109,7 +109,6 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	if c.Request().Header.Get("HX-Request") != "true" {
 		return Render(c, 200, compusers.PageFull(users, pageNum, sizeOfPageNum, int(count), role))
 	} else {
-		Render(c, 200, components.Navbar(role, "Users"))
-		return Render(c, 200, compusers.Page(users, pageNum, sizeOfPageNum, int(count)))
+		return Render(c, 200, compusers.Page(users, pageNum, sizeOfPageNum, int(count), role))
 	}
 }

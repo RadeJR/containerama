@@ -37,16 +37,16 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 		sizeOfPageNum = 10
 	}
 	cont, err := services.GetContainers()
+	paginatedCont := PaginateContainers(cont, pageNum, sizeOfPageNum)
 	if err != nil {
 		c.Response().Header().Set("HX-Retarget", "#popup")
 		return Render(c, 500, components.ErrorPopup(err, false))
 	}
 	if c.Request().Header.Get("HX-Request") != "true" {
-		return Render(c, 200, containers.PageFull(cont[(pageNum-1)*sizeOfPageNum:(pageNum-1)*sizeOfPageNum+sizeOfPageNum], pageNum, sizeOfPageNum, len(cont), c.(CustomContext).Locals["role"].(string)))
+		return Render(c, 200, containers.PageFull(paginatedCont, pageNum, sizeOfPageNum, len(cont), c.(CustomContext).Locals["role"].(string)))
 	} else {
 		role := c.(CustomContext).Locals["role"].(string)
-		Render(c, 200, components.Navbar(role, "Containers"))
-		return Render(c, 200, containers.Page(cont[(pageNum-1)*sizeOfPageNum:(pageNum-1)*sizeOfPageNum+sizeOfPageNum], pageNum, sizeOfPageNum, len(cont)))
+		return Render(c, 200, containers.Page(paginatedCont, pageNum, sizeOfPageNum, len(cont), role))
 	}
 }
 

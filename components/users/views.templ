@@ -9,12 +9,12 @@ var headers = []string{"ID", "Username", "Full Name", "Email", "Role", "Created 
 
 templ PageFull(users []models.User, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Base(userRole) {
-		@components.Navbar(userRole, "Containers")
-		@Page(users, page, sizeOfPage, containerCount)
+		@Page(users, page, sizeOfPage, containerCount, userRole)
 	}
 }
 
-templ Page(users []models.User, page int, sizeOfPage int, containerCount int) {
+templ Page(users []models.User, page int, sizeOfPage int, containerCount int, userRole string) {
+	@components.Navbar(userRole, "Users")
 	@components.Content("Users", "View Users", "/users/create") {
 		@components.Table(headers, page, sizeOfPage, containerCount) {
 			for _, user := range users {
