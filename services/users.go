@@ -83,6 +83,6 @@ func NewUserRowData(user models.User) components.RowData {
 		rowData.Fields[3] = "N/A"
 	}
 	rowData.Fields[4] = user.Role
-	rowData.Fields[5] = user.CreatedAt.Format(time.RFC3339)
+	rowData.Fields[5] = user.CreatedAt.Format(time.ANSIC)
 	return rowData
 }
