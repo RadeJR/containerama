@@ -72,7 +72,11 @@ func NewUserRowData(user models.User) components.RowData {
 
 	rowData.Fields[0] = fmt.Sprint(user.ID)
 	rowData.Fields[1] = user.Username
-	rowData.Fields[2] = fmt.Sprint(user.FirstName, user.LastName)
+	if user.LastName.Valid {
+		rowData.Fields[2] = fmt.Sprintf("%v %v", user.FirstName, user.LastName.String)
+	} else {
+		rowData.Fields[2] = user.FirstName
+	}
 	if user.Email.Valid {
 		rowData.Fields[3] = user.Email.String
 	} else {

@@ -85,16 +85,13 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	users := []models.User{}
 	err = db.DB.Select(&users, "SELECT * FROM users LIMIT 10")
 	if err != nil {
-		c.Response().Header().Set("HX-Retarget", "#popup")
-		return Render(c, 500, components.ErrorPopup(err))
+		return err
 	}
 	var count int64
 	err = db.DB.Get(&count, "SELECT count(*) FROM users")
 	if err != nil {
-		c.Response().Header().Set("HX-Retarget", "#popup")
-		return Render(c, 500, components.ErrorPopup(err))
+		return err
 	}
-
 	tableData := components.TableData{
 		Rows: make([]components.RowData, len(users)),
 	}
