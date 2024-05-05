@@ -10,7 +10,7 @@ templ PageFull(td components.TableData, page int, size int, count int, userRole 
 
 templ Page(td components.TableData, page int, size int, count int, role string) {
 	@components.Navbar(role, "Networks")
-	@components.Content("Containers", "View Containers", "/networks/create") {
+	@components.Content("Networks", "View Networks", "/networks/create") {
 		@components.Table(td, page, size, count)
 		@components.Pagination(page, size, count, "/networks")
 	}
