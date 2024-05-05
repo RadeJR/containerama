@@ -52,10 +52,6 @@ func StopContainer(id string) error {
 func CreateContainer(data ContainerData) error {
 	ctx := context.Background()
 
-	if data.Image == "" {
-		return imageError{Message: "Image is required"}
-	}
-
 	reader, err := cli.ImagePull(ctx, data.Image, types.ImagePullOptions{})
 	if err != nil {
 		return err

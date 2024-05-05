@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"log/slog"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -19,7 +19,11 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 		var err error
 		pageNum, err = strconv.Atoi(pageString)
 		if err != nil {
-			return RenderError(c, http.StatusBadRequest, err)
+			if ne, ok := err.(*strconv.NumError); ok {
+				return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Error parsing page number: function=%v value=%v error=%v ", ne.Func, ne.Num, ne.Err.Error()))
+			} else {
+				return err
+			}
 		}
 	} else {
 		pageNum = 1
@@ -30,15 +34,18 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 		var err error
 		sizeOfPageNum, err = strconv.Atoi(sizeOfPageString)
 		if err != nil {
-			return RenderError(c, http.StatusBadRequest, err)
+			if ne, ok := err.(*strconv.NumError); ok {
+				return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Error parsing page size: function=%v value=%v error=%v ", ne.Func, ne.Num, ne.Err.Error()))
+			} else {
+				return err
+			}
 		}
 	} else {
 		sizeOfPageNum = 10
 	}
 	cont, err := services.GetContainers()
 	if err != nil {
-		slog.Error("Error getting containers", "error", err.Error())
-		return c.String(http.StatusInternalServerError, "Internal server error")
+		return err
 	}
 	paginatedCont := PaginateContainers(cont, pageNum, sizeOfPageNum)
 	role := c.(CustomContext).Locals["role"].(string)
@@ -68,7 +75,7 @@ func (h DockerHandler) CreateContainer(c echo.Context) error {
 	var err error
 	err = services.Validate.Struct(data)
 	if err != nil {
-		return RenderError(c, http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, "Please check validity")
 	}
 
 	err = services.CreateContainer(data)

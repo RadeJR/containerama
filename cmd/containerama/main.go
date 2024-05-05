@@ -2,17 +2,33 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/handlers"
 	"github.com/RadeJR/containerama/middleware"
 	"github.com/RadeJR/containerama/services"
+	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/michaeljs1990/sqlitestore"
 )
+
+func customHTTPErrorHandler(err error, c echo.Context) {
+	if he, ok := err.(*echo.HTTPError); ok {
+		code := he.Code
+		handlers.RenderError(c, code, err)
+	} else if client.IsErrNotFound(err) {
+		code := http.StatusNotFound
+		handlers.RenderError(c, code, err)
+	} else {
+		code := http.StatusInternalServerError
+		c.Logger().Error(err)
+		c.String(code, "Internal server errror")
+	}
+}
 
 func init() {
 	err := godotenv.Load()
@@ -29,6 +45,7 @@ func main() {
 	defer db.CloseDB()
 	defer services.CloseClient()
 	app := echo.New()
+	app.HTTPErrorHandler = customHTTPErrorHandler
 	// STATIC
 	app.Static("/", "assets")
 

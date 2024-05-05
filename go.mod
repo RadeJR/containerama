@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.2
 
 require (
-	github.com/a-h/templ v0.2.501
+	github.com/a-h/templ v0.2.663
 	github.com/docker/docker v24.0.7+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/jmoiron/sqlx v1.4.0
