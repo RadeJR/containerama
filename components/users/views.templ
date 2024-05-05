@@ -8,7 +8,7 @@ import (
 var headers = []string{"ID", "Username", "Full Name", "Email", "Role", "Created at"}
 
 templ PageFull(users []models.User, page int, sizeOfPage int, containerCount int, userRole string) {
-	@components.Base(userRole) {
+	@components.Base() {
 		@Page(users, page, sizeOfPage, containerCount, userRole)
 	}
 }

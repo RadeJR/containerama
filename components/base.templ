@@ -1,6 +1,6 @@
 package components
 
-templ Base(userRole string) {
+templ Base() {
 	<html>
 		<head>
 			<title>Containerama</title>
@@ -12,7 +12,9 @@ templ Base(userRole string) {
 		</head>
 		<body class="bg-gray-900">
 			<div id="popup"></div>
-			{ children... }
+			<div id="page">
+				{ children... }
+			</div>
 		</body>
 	</html>
 }

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"log/slog"
+	"net/http"
 
 	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/db"
@@ -14,13 +14,17 @@ import (
 type LoginHandler struct{}
 
 func (h LoginHandler) ShowLoginPage(c echo.Context) error {
-	return Render(c, 200, components.Login())
+	if c.Request().Header.Get("HX-Request") != "true" {
+		return Render(c, 200, components.LoginPage())
+	} else {
+		return Render(c, 200, components.Login())
+	}
 }
 
 func (h LoginHandler) Login(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.String(500, err.Error())
+		return err
 	}
 
 	if !sess.IsNew {
@@ -32,24 +36,28 @@ func (h LoginHandler) Login(c echo.Context) error {
 		Password string `form:"password"`
 	}
 	var data formData
-	c.Bind(&data)
+	err = c.Bind(&data)
+	if err != nil {
+		return err
+	}
 
 	user := models.User{}
 
 	err = db.DB.Get(&user, "SELECT * FROM users WHERE username = ?", data.Username)
 	if err != nil {
-		slog.Error("Failed getting user from db", "username", data.Username, "error", err)
-		return c.String(504, "Wrong username or password")
+		return echo.NewHTTPError(http.StatusUnauthorized, "Wrong username or password")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(data.Password)); err != nil {
-		return c.String(504, "Wrong username or password")
+		return echo.NewHTTPError(http.StatusUnauthorized, "Wrong username or password")
 	}
 
 	sess.Values["name"] = user.Username
 	sess.Values["role"] = user.Role
 
-	sess.Save(c.Request(), c.Response())
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return err
+	}
 
 	return c.Redirect(302, "/")
 }
@@ -57,9 +65,11 @@ func (h LoginHandler) Login(c echo.Context) error {
 func (h LoginHandler) Logout(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.String(500, "server errror")
+		return err
 	}
 	sess.Options.MaxAge = -1
-	sess.Save(c.Request(), c.Response())
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return err
+	}
 	return c.Redirect(302, "/login")
 }

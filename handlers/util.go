@@ -1,13 +1,11 @@
 package handlers
 
 import (
-	"log/slog"
-	"net/http"
+	"strconv"
 
 	"github.com/RadeJR/containerama/components"
 	"github.com/a-h/templ"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
 )
 
@@ -37,13 +35,30 @@ func RenderError(c echo.Context, statusCode int, err error) error {
 	return Render(c, statusCode, components.ErrorPopup(err))
 }
 
-func RenderDockerError(c echo.Context, err error) error {
-	if client.IsErrConnectionFailed(err) {
-		slog.Error("Error connecting to docker", "error", err.Error())
-		return c.String(http.StatusInternalServerError, "Internal server error")
+func GetPaginationInfo(c echo.Context) (int, int, error) {
+	// PARSING QueryParam
+	pageString := c.QueryParam("page")
+	var pageNum int
+	if pageString != "" {
+		var err error
+		pageNum, err = strconv.Atoi(pageString)
+		if err != nil {
+			return -1, -1, err
+		}
+	} else {
+		pageNum = 1
 	}
-	if client.IsErrNotFound(err) {
-		return RenderError(c, http.StatusNotFound, err)
+	sizeOfPageString := c.QueryParam("size")
+	var sizeOfPageNum int
+	if sizeOfPageString != "" {
+		var err error
+		sizeOfPageNum, err = strconv.Atoi(sizeOfPageString)
+		if err != nil {
+			return -1, -1, err
+		}
+	} else {
+		sizeOfPageNum = 10
 	}
-	return RenderError(c, http.StatusBadRequest, err)
+	return pageNum, sizeOfPageNum, nil
+
 }

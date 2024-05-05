@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/RadeJR/containerama/handlers"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -35,7 +37,7 @@ func OnlyAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 		if c.(handlers.CustomContext).Locals["role"] == "admin" {
 			return next(c)
 		} else {
-			return c.String(403, "Unauthorized")
+			return echo.NewHTTPError(http.StatusUnauthorized)
 		}
 	}
 }
