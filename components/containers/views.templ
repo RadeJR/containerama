@@ -1,25 +1,21 @@
 package containers
 
 import (
-	"github.com/docker/docker/api/types"
 	"github.com/RadeJR/containerama/components"
 )
 
-var headers = []string{"ID", "Image", "Name", "Ports", "State", "Created at", "Controls"}
+var Headers = []string{"ID", "Image", "Name", "Ports", "State", "Created at", "Controls"}
 
-templ PageFull(cont []types.Container, page int, sizeOfPage int, containerCount int, userRole string) {
+templ PageFull(td components.TableData, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Base() {
-		@Page(cont, page, sizeOfPage, containerCount, userRole)
+		@Page(td, page, sizeOfPage, containerCount, userRole)
 	}
 }
 
-templ Page(containers []types.Container, page int, sizeOfPage int, containerCount int, role string) {
+templ Page(td components.TableData, page int, sizeOfPage int, containerCount int, role string) {
 	@components.Navbar(role, "Containers")
 	@components.Content("Containers", "View Containers", "/containers/create") {
-		@components.Table(headers, page, sizeOfPage, containerCount) {
-			for _, container := range containers {
-				@Row(container)
-			}
-		}
+		@components.Table(td, page, sizeOfPage, containerCount)
+		@components.Pagination(page, sizeOfPage, containerCount, "/containers")
 	}
 }

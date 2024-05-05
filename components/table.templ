@@ -1,41 +1,41 @@
 package components
 
-import "fmt"
+type TableData struct {
+	Headers []string
+	Rows    []RowData
+}
 
-templ Table(headers []string, page int, sizeOfPage int, totalCount int) {
-  <div id="table" class="w-full overflow-y-hidden rounded-lg">
-    <div class="overflow-x-auto">
-      <table class="table-auto w-full">
-        <thead>
-          <tr class="bg-gray-900 text-left text-xs font-semibold uppercase tracking-widest text-white">
-            for _,v := range headers {
-              <th class="px-5 py-3">{v}</th>
-            }
-          </tr>
-        </thead>
-        <tbody class="text-gray-500">
-          {children...}
-        </tbody>
-      </table>
-    </div>
-    <div class="flex flex-col items-center border-t bg-white px-5 py-5 sm:flex-row sm:justify-between">
-      <span class="text-xs text-gray-600 sm:text-sm">Showing { fmt.Sprint(sizeOfPage*(page-1)) } to { fmt.Sprint((sizeOfPage*(page-1))+sizeOfPage) } of { fmt.Sprint(totalCount) } Entries </span>
-      <div class="mt-2 inline-flex sm:mt-0">
-        <button class={"mr-2 h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150",templ.KV("hover:bg-gray-100", page != 1), templ.KV("bg-gray-200", page == 1)}
-        hx-get={"/containers?page="+fmt.Sprint(page-1) }
-        hx-push-url="true"
-        if page == 1 {
-          disabled
-        }
-        >Prev</button>
-        <button class={"h-12 w-12 rounded-full border text-sm font-semibold text-gray-600 transition duration-150", templ.KV("hover:bg-gray-100", (sizeOfPage*(page-1))+sizeOfPage < totalCount), templ.KV("bg-gray-200", (sizeOfPage*(page-1))+sizeOfPage >= totalCount)}
-        hx-get={"/containers?page="+fmt.Sprint(page+1) }
-        hx-push-url="true"
-        if (sizeOfPage*(page-1))+sizeOfPage >= totalCount {
-          disabled
-        }
-        >Next</button>
-      </div>
-    </div>
-  </div>
+type RowData struct {
+	Fields []string
+}
+
+templ Table(td TableData, page int, sizeOfPage int, totalCount int) {
+	<div id="table" class="w-full overflow-y-hidden rounded-t-lg">
+		<div class="overflow-x-auto">
+			<table class="table-auto w-full">
+				<thead>
+					<tr class="bg-gray-900 text-left text-xs font-semibold uppercase tracking-widest text-white">
+						for _,v := range td.Headers {
+							<th class="px-5 py-3">{ v }</th>
+						}
+					</tr>
+				</thead>
+				<tbody class="text-gray-500">
+					for _,v := range td.Rows {
+						@Row(v)
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}
+
+templ Row(data RowData) {
+	<tr>
+		for _,v := range data.Fields {
+			<td class="border-b border-gray-200 bg-white px-5 py-5 text-sm">
+				@templ.Raw(v)
+			</td>
+		}
+	</tr>
 }

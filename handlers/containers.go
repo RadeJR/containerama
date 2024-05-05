@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/components/containers"
 	"github.com/RadeJR/containerama/services"
 	"github.com/labstack/echo/v4"
@@ -18,11 +19,20 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 		return err
 	}
 	paginatedCont := PaginateContainers(cont, page, size)
+
+	tableData := components.TableData{
+		Rows: make([]components.RowData, len(paginatedCont)),
+	}
+	tableData.Headers = containers.Headers
+	for k,v := range paginatedCont {
+		tableData.Rows[k] = services.NewRowData(v)
+	}
+
 	role := c.(CustomContext).Locals["role"].(string)
 	if c.Request().Header.Get("HX-Request") != "true" {
-		return Render(c, 200, containers.PageFull(paginatedCont, page, size, len(cont), role))
+		return Render(c, 200, containers.PageFull(tableData, page, size, len(cont), role))
 	} else {
-		return Render(c, 200, containers.Page(paginatedCont, page, size, len(cont), role))
+		return Render(c, 200, containers.Page(tableData, page, size, len(cont), role))
 	}
 }
 

@@ -1,0 +1,17 @@
+package networks
+
+import "github.com/RadeJR/containerama/components"
+
+templ PageFull(td components.TableData, page int, size int, count int, userRole string) {
+	@components.Base() {
+		@Page(td, page, size, count, userRole)
+	}
+}
+
+templ Page(td components.TableData, page int, size int, count int, role string) {
+	@components.Navbar(role, "Networks")
+	@components.Content("Containers", "View Containers", "/networks/create") {
+		@components.Table(td, page, size, count)
+		@components.Pagination(page, size, count, "/networks")
+	}
+}

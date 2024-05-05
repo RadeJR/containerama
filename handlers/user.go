@@ -13,6 +13,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var Headers = []string{"ID", "Username", "Full Name", "Email", "Role", "Created at"}
+
 type UserHandler struct{}
 
 func (h UserHandler) CreateUser(c echo.Context) error {
@@ -93,10 +95,18 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 		return Render(c, 500, components.ErrorPopup(err))
 	}
 
+	tableData := components.TableData{
+		Rows: make([]components.RowData, len(users)),
+	}
+	tableData.Headers = Headers
+	for k,v := range users {
+		tableData.Rows[k] = services.NewUserRowData(v)
+	}
+
 	// Rendering response
 	if c.Request().Header.Get("HX-Request") != "true" {
-		return Render(c, 200, compusers.PageFull(users, page, size, int(count), role))
+		return Render(c, 200, compusers.PageFull(tableData, page, size, int(count), role))
 	} else {
-		return Render(c, 200, compusers.Page(users, page, size, int(count), role))
+		return Render(c, 200, compusers.Page(tableData, page, size, int(count), role))
 	}
 }

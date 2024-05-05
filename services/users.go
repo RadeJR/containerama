@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
+	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/models"
 	"github.com/sethvargo/go-password/password"
@@ -61,4 +63,22 @@ func EnsureAdminUserExists() {
 		fmt.Println(password)
 		slog.Info("Admin user created", "Username", user.Username, "Password", password)
 	}
+}
+
+func NewUserRowData(user models.User) components.RowData {
+	rowData := components.RowData{
+		Fields: make([]string, 6),
+	}
+
+	rowData.Fields[0] = fmt.Sprint(user.ID)
+	rowData.Fields[1] = user.Username
+	rowData.Fields[2] = fmt.Sprint(user.FirstName, user.LastName)
+	if user.Email.Valid {
+		rowData.Fields[3] = user.Email.String
+	} else {
+		rowData.Fields[3] = "N/A"
+	}
+	rowData.Fields[4] = user.Role
+	rowData.Fields[5] = user.CreatedAt.Format(time.RFC3339)
+	return rowData
 }

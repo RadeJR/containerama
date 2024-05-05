@@ -1,6 +1,8 @@
 package containers
 
-import "github.com/docker/go-connections/nat"
+import (
+	"github.com/docker/go-connections/nat"
+)
 
 func displayEnv(env []string) string {
 	var envStr string

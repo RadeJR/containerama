@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/RadeJR/containerama/components"
 	"github.com/a-h/templ"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,6 +30,15 @@ func PaginateContainers(cont []types.Container, page int, size int) []types.Cont
 		upper = count
 	}
 	return cont[lower:upper]
+}
+func PaginateNetworks(nr []types.NetworkResource, page int, size int) []types.NetworkResource {
+	count := len(nr)
+	lower := (page - 1) * size
+	upper := page * size
+	if upper > count {
+		upper = count
+	}
+	return nr[lower:upper]
 }
 
 func RenderError(c echo.Context, statusCode int, err error) error {
@@ -61,4 +72,18 @@ func GetPaginationInfo(c echo.Context) (int, int, error) {
 	}
 	return pageNum, sizeOfPageNum, nil
 
+}
+
+func CustomHTTPErrorHandler(err error, c echo.Context) {
+	if he, ok := err.(*echo.HTTPError); ok {
+		code := he.Code
+		RenderError(c, code, err)
+	} else if client.IsErrNotFound(err) {
+		code := http.StatusNotFound
+		RenderError(c, code, err)
+	} else {
+		code := http.StatusInternalServerError
+		c.Logger().Error(err)
+		c.String(code, "Internal server errror")
+	}
 }

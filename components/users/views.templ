@@ -1,25 +1,20 @@
 package users
 
 import (
-	"github.com/RadeJR/containerama/models"
 	"github.com/RadeJR/containerama/components"
 )
 
-var headers = []string{"ID", "Username", "Full Name", "Email", "Role", "Created at"}
 
-templ PageFull(users []models.User, page int, sizeOfPage int, containerCount int, userRole string) {
+templ PageFull(td components.TableData, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Base() {
-		@Page(users, page, sizeOfPage, containerCount, userRole)
+		@Page(td, page, sizeOfPage, containerCount, userRole)
 	}
 }
 
-templ Page(users []models.User, page int, sizeOfPage int, containerCount int, userRole string) {
+templ Page(td components.TableData, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Navbar(userRole, "Users")
 	@components.Content("Users", "View Users", "/users/create") {
-		@components.Table(headers, page, sizeOfPage, containerCount) {
-			for _, user := range users {
-				@Row(user)
-			}
-		}
+		@components.Table(td, page, sizeOfPage, containerCount)
+		@components.Pagination(page, sizeOfPage, containerCount, "/users")
 	}
 }
