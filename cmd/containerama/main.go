@@ -19,17 +19,15 @@ func init() {
 	if err != nil {
 		log.Fatal("Failed to load env")
 	}
-
 	db.InitializeDB()
-
 	services.InitializeCient()
-	defer services.CloseClient()
-
+	services.InitializeValidator()
 	services.EnsureAdminUserExists()
 }
 
 func main() {
 	defer db.CloseDB()
+	defer services.CloseClient()
 	app := echo.New()
 	// STATIC
 	app.Static("/", "assets")

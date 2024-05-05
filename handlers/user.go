@@ -72,7 +72,7 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 		pageNum, err = strconv.Atoi(pageString)
 		if err != nil {
 			c.Response().Header().Set("HX-Retarget", "#popup")
-			return Render(c, 500, components.ErrorPopup(err, false))
+			return Render(c, 500, components.ErrorPopup(err))
 		}
 	} else {
 		pageNum = 1
@@ -84,7 +84,7 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 		sizeOfPageNum, err = strconv.Atoi(sizeOfPageString)
 		if err != nil {
 			c.Response().Header().Set("HX-Retarget", "#popup")
-			return Render(c, 500, components.ErrorPopup(err, false))
+			return Render(c, 500, components.ErrorPopup(err))
 		}
 	} else {
 		sizeOfPageNum = 10
@@ -96,13 +96,13 @@ func (h UserHandler) ShowUsers(c echo.Context) error {
 	err := db.DB.Select(&users, "SELECT * FROM users LIMIT 10")
 	if err != nil {
 		c.Response().Header().Set("HX-Retarget", "#popup")
-		return Render(c, 500, components.ErrorPopup(err, false))
+		return Render(c, 500, components.ErrorPopup(err))
 	}
 	var count int64
 	err = db.DB.Get(&count, "SELECT count(*) FROM users")
 	if err != nil {
 		c.Response().Header().Set("HX-Retarget", "#popup")
-		return Render(c, 500, components.ErrorPopup(err, false))
+		return Render(c, 500, components.ErrorPopup(err))
 	}
 
 	// Rendering response

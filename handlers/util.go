@@ -1,8 +1,13 @@
 package handlers
 
 import (
+	"log/slog"
+	"net/http"
+
+	"github.com/RadeJR/containerama/components"
 	"github.com/a-h/templ"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,4 +30,20 @@ func PaginateContainers(cont []types.Container, page int, size int) []types.Cont
 		upper = count
 	}
 	return cont[lower:upper]
+}
+
+func RenderError(c echo.Context, statusCode int, err error) error {
+	c.Response().Header().Set("HX-Retarget", "#popup")
+	return Render(c, statusCode, components.ErrorPopup(err))
+}
+
+func RenderDockerError(c echo.Context, err error) error {
+	if client.IsErrConnectionFailed(err) {
+		slog.Error("Error connecting to docker", "error", err.Error())
+		return c.String(http.StatusInternalServerError, "Internal server error")
+	}
+	if client.IsErrNotFound(err) {
+		return RenderError(c, http.StatusNotFound, err)
+	}
+	return RenderError(c, http.StatusBadRequest, err)
 }

@@ -12,9 +12,8 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-
 type ContainerData struct {
-	Image           string `form:"image"`
+	Image           string `form:"image" validate:"required"`
 	Name            string `form:"name"`
 	Env             string `form:"env"`
 	Cmd             string `form:"cmd"`
