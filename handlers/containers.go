@@ -4,12 +4,19 @@ import (
 	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/components/containers"
 	"github.com/RadeJR/containerama/services"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
+var containerHeaders = []string{"ID", "Image", "Name", "Ports", "State", "Created at", "Controls"}
 type DockerHandler struct{}
 
 func (h DockerHandler) GetContainers(c echo.Context) error {
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return err
+	}
+	role := sess.Values["role"].(string)
 	page, size, err := GetPaginationInfo(c)
 	if err != nil {
 		return err
@@ -19,16 +26,13 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 		return err
 	}
 	paginatedCont := PaginateContainers(cont, page, size)
-
 	tableData := components.TableData{
 		Rows: make([]components.RowData, len(paginatedCont)),
 	}
-	tableData.Headers = containers.Headers
+	tableData.Headers = containerHeaders
 	for k, v := range paginatedCont {
 		tableData.Rows[k] = services.NewRowData(v)
 	}
-
-	role := c.(CustomContext).Locals["role"].(string)
 	if c.Request().Header.Get("HX-Request") != "true" {
 		return Render(c, 200, containers.PageFull(tableData, page, size, len(cont), role))
 	} else {

@@ -34,10 +34,8 @@ func main() {
 	// STATIC
 	app.Static("/", "assets")
 
-	app.Use(middleware.CreateLocals)
-
 	// session middleware
-	store, err := sqlitestore.NewSqliteStore("./db.sqlite3", "sessions", "/", 3600, []byte(os.Getenv("SESSION_SECRET")))
+	store, err := sqlitestore.NewSqliteStoreFromConnection(db.DB, "sessions", "/", 3600, []byte(os.Getenv("SESSION_SECRET")))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -52,7 +52,8 @@ func (h LoginHandler) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Wrong username or password")
 	}
 
-	sess.Values["name"] = user.Username
+	sess.Values["id"] = user.ID
+	sess.Values["username"] = user.Username
 	sess.Values["role"] = user.Role
 
 	if err := sess.Save(c.Request(), c.Response()); err != nil {

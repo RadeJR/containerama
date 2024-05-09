@@ -9,6 +9,7 @@ import (
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/models"
 	"github.com/RadeJR/containerama/services"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -76,12 +77,16 @@ func (h UserHandler) CreateUserForm(c echo.Context) error {
 }
 
 func (h UserHandler) ShowUsers(c echo.Context) error {
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return err
+	}
+	role := sess.Values["role"].(string)
+
 	page, size, err := GetPaginationInfo(c)
 	if err != nil {
 		return err
 	}
-	// Getting data
-	role := c.(CustomContext).Locals["role"].(string)
 	users := []models.User{}
 	err = db.DB.Select(&users, "SELECT * FROM users LIMIT 10")
 	if err != nil {

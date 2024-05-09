@@ -4,8 +4,6 @@ import (
 	"github.com/RadeJR/containerama/components"
 )
 
-var Headers = []string{"ID", "Image", "Name", "Ports", "State", "Created at", "Controls"}
-
 templ PageFull(td components.TableData, page int, sizeOfPage int, containerCount int, userRole string) {
 	@components.Base() {
 		@Page(td, page, sizeOfPage, containerCount, userRole)
