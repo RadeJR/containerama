@@ -10,7 +10,7 @@ watch:
 	@CompileDaemon -command="./main" -exclude-dir=.git -build="make build" -exclude="*_templ.go" -include="*.templ"
 
 migrate:
-	@goose -dir db/migrations sqlite3 ./db.sqlite3 up
+	@goose -dir db/migrations sqlite3 ./data/db.sqlite3 up
 
 migrate-down:
-	@goose -dir db/migrations sqlite3 ./db.sqlite3 down
+	@goose -dir db/migrations sqlite3 ./data/db.sqlite3 down
