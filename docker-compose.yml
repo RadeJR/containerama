@@ -1,0 +1,53 @@
+networks:
+  traefik:
+volumes:
+  ssl-certs:
+  data:
+
+services:
+  traefik:
+    restart: unless-stopped
+    image: traefik:v2.11.0
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ssl-certs:/etc/traefik/certs
+    networks:
+      - traefik
+    environment:
+      - TRAEFIK_ACCESSLOG=true
+      - TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY=true
+      - TRAEFIK_LOG=true
+      - TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80
+      - TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_TO=websecure
+      - TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_SCHEME=https
+      - TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS=:443
+      - TRAEFIK_CERTIFICATESRESOLVERS_DNS_ACME_EMAIL=radejunior@proton.me
+      - TRAEFIK_CERTIFICATESRESOLVERS_DNS_ACME_STORAGE=/etc/traefik/certs/acme.json
+      - TRAEFIK_CERTIFICATESRESOLVERS_DNS_ACME_CASERVER=https://acme-v02.api.letsencrypt.org/directory
+      - TRAEFIK_CERTIFICATESRESOLVERS_DNS_ACME_DNSCHALLENGE_PROVIDER=cloudflare
+      - TRAEFIK_CERTIFICATESRESOLVERS_DNS_ACME_DNSCHALLENGE_RESOLVERS=1.1.1.1:53
+      - TRAEFIK_PROVIDERS_DOCKER_NETWORK=traefik
+      - TRAEFIK_CERTIFICATESRESOLVERS_DNS_ACME_DNSCHALLENGE_PROVIDER=cloudflare
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN:-}
+  app:
+    build: .
+    environment:
+      - SESSION_SECRET=${SESSION_SECRET:-this-is-a-super-secret-string}
+    volumes:
+      - data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 3000:80
+    networks:
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.ui.rule: Host(`containerama.radojkovic.in.rs`)
+      traefik.http.routers.ui.tls: "true"
+      traefik.http.routers.ui.tls.certresolver: dns
+      traefik.http.services.ui.loadbalancer.server.port: 80
+    

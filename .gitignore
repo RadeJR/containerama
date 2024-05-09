@@ -1,4 +1,4 @@
 /main
 .env
 *_templ.go
-db.sqlite3
+/data

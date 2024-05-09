@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"os"
 
 	"github.com/RadeJR/containerama/db"
@@ -15,8 +16,9 @@ import (
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Failed to load env")
+	err := godotenv.Load()
+	if err != nil {
+		slog.Error("Failed to load env", "error", err)
 	}
 	db.InitializeDB()
 	services.InitializeCient()
@@ -80,5 +82,5 @@ func main() {
 	// networks.GET("/remove/:id", dockerHandler.RemoveNetwork)
 	// networks.GET(":id", dockerHandler.ShowNetwork)
 
-	app.Start(":3000")
+	app.Start(os.Getenv("BIND_ADDR"))
 }

@@ -24,7 +24,7 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 		Rows: make([]components.RowData, len(paginatedCont)),
 	}
 	tableData.Headers = containers.Headers
-	for k,v := range paginatedCont {
+	for k, v := range paginatedCont {
 		tableData.Rows[k] = services.NewRowData(v)
 	}
 
