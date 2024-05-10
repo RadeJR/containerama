@@ -80,6 +80,13 @@ func main() {
 	// networks.POST("/create", dockerHandler.CreateNetwork)
 	// networks.GET("/remove/:id", dockerHandler.RemoveNetwork)
 	// networks.GET(":id", dockerHandler.ShowNetwork)
+
+
+	// STACKS
+	stackHandler := handlers.StackHandler{}
+	stacks := app.Group("/stacks", middleware.ValidateSession)
+	stacks.GET("", stackHandler.GetStacks)
+
 	
 	// API
 	api := app.Group("/api")
