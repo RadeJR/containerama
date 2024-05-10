@@ -13,7 +13,11 @@ func ValidateSession(next echo.HandlerFunc) echo.HandlerFunc {
 		sess, err := session.Get("session", c)
 		if err != nil || sess.IsNew {
 			if ok, _ := regexp.Match("/api/*", []byte(c.Path())); ok {
-				return c.JSON(http.StatusUnprocessableEntity, "unauthorized")
+				sess.Options.MaxAge = -1
+				if err := sess.Save(c.Request(), c.Response()); err != nil {
+					return err
+				}
+				return c.JSON(http.StatusUnauthorized, "unauthorized")
 			}
 			return c.Redirect(302, "/login")
 		}
@@ -27,7 +31,7 @@ func OnlyAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return c.Redirect(302, "/login")
 		}
-		
+
 		if sess.Values["role"] == "admin" {
 			return next(c)
 		} else {

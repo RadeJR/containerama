@@ -34,6 +34,7 @@ func main() {
 	app.HTTPErrorHandler = handlers.CustomHTTPErrorHandler
 	// STATIC
 	app.Static("/", "assets")
+	app.Static("/svelte", "frontend/dist")
 
 	// session middleware
 	store, err := sqlitestore.NewSqliteStoreFromConnection(db.DB, "sessions", "/", 3600, []byte(os.Getenv("SESSION_SECRET")))
