@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/RadeJR/containerama/components"
@@ -17,15 +18,6 @@ func Render(ctx echo.Context, statusCode int, t templ.Component) error {
 	return t.Render(ctx.Request().Context(), ctx.Response().Writer)
 }
 
-func PaginateContainers(cont []types.Container, page int, size int) []types.Container {
-	count := len(cont)
-	lower := (page - 1) * size
-	upper := page * size
-	if upper > count {
-		upper = count
-	}
-	return cont[lower:upper]
-}
 func PaginateNetworks(nr []types.NetworkResource, page int, size int) []types.NetworkResource {
 	count := len(nr)
 	lower := (page - 1) * size
@@ -70,6 +62,12 @@ func GetPaginationInfo(c echo.Context) (int, int, error) {
 }
 
 func CustomHTTPErrorHandler(err error, c echo.Context) {
+
+	if ok, _ := regexp.Match("/api/*", []byte(c.Path())); ok {
+		c.JSON(500, err)
+		return
+	}
+
 	if he, ok := err.(*echo.HTTPError); ok {
 		code := he.Code
 		RenderError(c, code, err)

@@ -1,38 +1,27 @@
-package handlers
+package api
 
 import (
 	"net/http"
 
-	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/services"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type LoginHandler struct{}
-
-func (h LoginHandler) ShowLoginPage(c echo.Context) error {
-	if c.Request().Header.Get("HX-Request") != "true" {
-		return Render(c, 200, components.LoginPage())
-	} else {
-		return Render(c, 200, components.Login())
-	}
-}
-
-func (h LoginHandler) Login(c echo.Context) error {
+func Login(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
 		return err
 	}
 
 	if !sess.IsNew {
-		return c.Redirect(302, "/")
+		return c.JSON(http.StatusOK, "Already logged in")
 	}
 
 	type formData struct {
-		Username string `form:"username"`
-		Password string `form:"password"`
+		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 	var data formData
 	err = c.Bind(&data)
@@ -57,10 +46,10 @@ func (h LoginHandler) Login(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(302, "/")
+	return c.NoContent(http.StatusNoContent)
 }
 
-func (h LoginHandler) Logout(c echo.Context) error {
+func Logout(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
 		return err
@@ -69,5 +58,5 @@ func (h LoginHandler) Logout(c echo.Context) error {
 	if err := sess.Save(c.Request(), c.Response()); err != nil {
 		return err
 	}
-	return c.Redirect(302, "/login")
+	return c.NoContent(http.StatusNoContent)
 }

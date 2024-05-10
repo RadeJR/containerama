@@ -25,7 +25,7 @@ func (h DockerHandler) GetContainers(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	paginatedCont := PaginateContainers(cont, page, size)
+	paginatedCont := services.PaginateContainers(cont, page, size)
 	tableData := components.TableData{
 		Rows: make([]components.RowData, len(paginatedCont)),
 	}

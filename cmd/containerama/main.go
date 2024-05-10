@@ -7,6 +7,7 @@ import (
 
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/handlers"
+	apihandlers "github.com/RadeJR/containerama/handlers/api"
 	"github.com/RadeJR/containerama/middleware"
 	"github.com/RadeJR/containerama/services"
 	"github.com/joho/godotenv"
@@ -79,6 +80,14 @@ func main() {
 	// networks.POST("/create", dockerHandler.CreateNetwork)
 	// networks.GET("/remove/:id", dockerHandler.RemoveNetwork)
 	// networks.GET(":id", dockerHandler.ShowNetwork)
+	
+	// API
+	api := app.Group("/api")
+	api.POST("/login", apihandlers.Login)
+	api.GET("/logout", apihandlers.Logout)
+
+	apicontainers := api.Group("/containers", middleware.ValidateSession)
+	apicontainers.GET("", apihandlers.GetContainers)
 
 	app.Start(os.Getenv("BIND_ADDR"))
 }

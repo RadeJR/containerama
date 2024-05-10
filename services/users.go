@@ -65,6 +65,16 @@ func EnsureAdminUserExists() {
 	}
 }
 
+func GetUserByUsername(username string) (*models.User, error) {
+	var user *models.User = &models.User{}
+	err := db.DB.Get(user, "SELECT * FROM users WHERE username = ?", username)
+	if err != nil {
+		slog.Error("Error retrieving user", "error", err)
+		return nil, err
+	}
+	return user, nil
+}
+
 func NewUserRowData(user models.User) components.RowData {
 	rowData := components.RowData{
 		Fields: make([]string, 6),

@@ -27,6 +27,16 @@ type ContainerData struct {
 	NetworkDisabled bool   `form:"networkDisabled"`
 }
 
+func PaginateContainers(cont []types.Container, page int, size int) []types.Container {
+	count := len(cont)
+	lower := (page - 1) * size
+	upper := page * size
+	if upper > count {
+		upper = count
+	}
+	return cont[lower:upper]
+}
+
 func GetContainers() ([]types.Container, error) {
 	cont, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
 	if err != nil {
