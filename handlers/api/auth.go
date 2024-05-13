@@ -19,11 +19,11 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusOK, "Already logged in")
 	}
 
-	type formData struct {
+	type jsonData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
-	var data formData
+	var data jsonData
 	err = c.Bind(&data)
 	if err != nil {
 		return err

@@ -14,12 +14,30 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "$lib": [
+        "./src/lib"
+      ],
+      "$lib/*": [
+        "./src/lib/*"
+      ],
+      "$conf": [
+        "./src/conf"
+      ],
+      "$conf/*": [
+        "./src/conf/*"
+      ],
+      "$store": [
+        "./src/store.ts"
+      ]
+    },
     "plugins": [
       {
         "name": "typescript-svelte-plugin",
         // the following options can be set additionally; they are optional; their default values are listed here
         "enabled": true, // enables this plugin
-        "assumeIsSvelteProject": false // if true, skip detection and always assume it's a Svelte project
+        "assumeIsSvelteProject": true // if true, skip detection and always assume it's a Svelte project
       }
     ]
   },

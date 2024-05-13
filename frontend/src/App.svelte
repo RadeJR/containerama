@@ -1,57 +1,33 @@
 <script lang="ts">
-  import axios from "axios";
-  import Router, { push } from "svelte-spa-router";
-  import Login from "./routes/Login.svelte";
-  import { routes } from "./routes";
+  import Router from "svelte-spa-router";
+  import { routes } from "./routes.js";
+  import { cookieExists } from "./services/auth";
   import { isAuthorized } from "./store";
-
-  function cookieExists(name: string): boolean {
-    // Split document.cookie string into individual cookies
-    const cookies: string[] = document.cookie.split(";");
-
-    // Iterate over cookies to find the one with the specified name
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie: string = cookies[i].trim();
-
-      // Check if cookie starts with the specified name
-      if (cookie.startsWith(name + "=")) {
-        return true; // Cookie exists
-      }
-    }
-
-    return false; // Cookie does not exist
-  }
+  import Login from "./lib/components/Login.svelte";
+  import { ModeWatcher } from "mode-watcher";
+  import { getAxios } from "$conf/axios.js";
+  import Base from "$lib/components/Base.svelte";
 
   if (cookieExists("session")) {
     console.log("Cookie exists!");
     isAuthorized.set(true);
-    push("/login")
   }
-  axios.interceptors.response.use(null, function (error) {
-    console.log("INTERCEPTED!!!")
-    console.log(error)
+
+  getAxios().interceptors.response.use(null, function (error) {
     if (error.response.status == 401) {
+      console.log("Unauthorized, setting to false");
       isAuthorized.set(false);
-      push("/login")
     }
     return Promise.reject(error);
   });
-
-  async function logout() {
-    const response = await axios.get("/api/containers", {
-      withCredentials: true
-    });
-  }
 </script>
 
-<main>
-  {#if $isAuthorized}
+<ModeWatcher />
+{#if $isAuthorized}
+  <!-- <Router {routes} /> -->
+  <Base>
     <Router {routes} />
-  {:else}
-    <Login />
-  {/if}
-  <button on:click={logout}></button>
-</main>
-
-<style>
-</style>
+  </Base>
+{:else}
+  <Login />
+{/if}

@@ -1,13 +1,8 @@
-import Home from './routes/Home.svelte'
-import Login from './routes/Login.svelte'
-import NotFound from './routes/NotFound.svelte'
+import Containers from "./routes/Containers.svelte";
+import Home from "./routes/Home.svelte"
 
 export const routes = {
-    // Exact path
-    '/': Home,
-    '/login': Login,
-
-    // Catch-all
-    // This is optional, but if present it must be the last
-    '*': NotFound,
-}
+  // Exact path
+  "/": Home,
+  "/containers": Containers
+};
