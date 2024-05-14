@@ -1,5 +1,8 @@
 <script lang="ts">
   import DataTable from "./DataTable.svelte";
+  import {fade} from 'svelte/transition'
 </script>
 
-<DataTable />
+<div transition:fade={{ duration: 100 }}>
+  <DataTable />
+</div>
