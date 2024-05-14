@@ -10,6 +10,8 @@ export default defineConfig({
       $lib: path.resolve("./src/lib"),
       $conf: path.resolve("./src/conf"),
       $store: path.resolve("./src/store"),
+      $app: path.resolve("./src"),
+      $services: path.resolve("./src/services"),
     },
   },
 })

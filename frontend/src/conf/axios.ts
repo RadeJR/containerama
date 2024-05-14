@@ -1,20 +1,32 @@
 import axios, { type AxiosRequestConfig, type AxiosInstance } from "axios"
+import { isAuthorized } from "$store";
 
 let customaxios: AxiosInstance
 
-export function getAxios(): AxiosInstance {
+function configureAxios(): AxiosInstance {
+
   let config: AxiosRequestConfig = {
     withCredentials: true,
     headers: {
       'Content-Type': 'application/json'
     },
   }
-  
-  console.log(customaxios)
-  if (customaxios == undefined) {
-    customaxios = axios.create(config)
-  }
+  customaxios = axios.create(config)
 
+  customaxios.interceptors.response.use(null, function(error) {
+    if (error.response.status == 401) {
+      console.log("Unauthorized, setting to false");
+      isAuthorized.set(false);
+    }
+    return Promise.reject(error);
+  });
+  return customaxios
+}
+
+export function getAxios(): AxiosInstance {
+  if (customaxios == undefined) {
+    return configureAxios()
+  }
   return customaxios
 }
 

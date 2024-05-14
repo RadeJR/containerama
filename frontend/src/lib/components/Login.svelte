@@ -3,7 +3,7 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import type { AxiosResponse } from "axios";
-  import LightSwitch from "./LightSwitch.svelte";
+  import LightSwitch from "$lib/components/LightSwitch.svelte";
   import { getAxios } from "$conf/axios";
   import { isAuthorized } from "$store";
 

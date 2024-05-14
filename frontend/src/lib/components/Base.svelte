@@ -10,7 +10,7 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
   import Nav from "$lib/components/Nav.svelte";
-    import LightSwitch from "./LightSwitch.svelte";
+  import LightSwitch from "$lib/components/LightSwitch.svelte";
 </script>
 
 <div

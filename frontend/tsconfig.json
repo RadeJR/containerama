@@ -30,6 +30,18 @@
       ],
       "$store": [
         "./src/store.ts"
+      ],
+      "$app": [
+        "./src"
+      ],
+      "$app/*": [
+        "./src/*"
+      ],
+      "$services": [
+        "./src/services"
+      ],
+      "$services/*": [
+        "./src/services/*"
       ]
     },
     "plugins": [

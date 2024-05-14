@@ -1,4 +1,4 @@
-import Containers from "./routes/Containers.svelte";
+import Containers from "./routes/containers/Page.svelte";
 import Home from "./routes/Home.svelte"
 
 export const routes = {

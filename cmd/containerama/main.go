@@ -96,6 +96,7 @@ func main() {
 
 	apicontainers := api.Group("/containers", middleware.ValidateSession)
 	apicontainers.GET("", apihandlers.GetContainers)
+	apicontainers.PUT("/:id", apihandlers.StopContainer)
 
 	app.Start(os.Getenv("BIND_ADDR"))
 }

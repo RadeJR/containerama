@@ -1,8 +1,10 @@
 <script lang="ts">
+  // icons
   import Package from "lucide-svelte/icons/package";
-  import Home from "lucide-svelte/icons/home";
-  import ShoppingCart from "lucide-svelte/icons/shopping-cart";
+  import Network from "lucide-svelte/icons/network";
   import Users from "lucide-svelte/icons/users";
+  import Layers from "lucide-svelte/icons/layers"
+  // packages
   import { link } from "svelte-spa-router";
   import { location } from "svelte-spa-router";
   import { onMount } from "svelte";
@@ -34,15 +36,15 @@
 
 <nav class="grid items-start px-2 text-sm font-medium lg:px-4">
   <a href="/containers" use:link class={navInactiveClass}>
-    <Home class="h-4 w-4" />
+    <Package class="h-4 w-4" />
     Containers
   </a>
   <a href="/networks" use:link class={navInactiveClass}>
-    <ShoppingCart class="h-4 w-4" />
+    <Network class="h-4 w-4" />
     Networks
   </a>
   <a href="/stacks" use:link class={navInactiveClass}>
-    <Package class="h-4 w-4" />
+    <Layers class="h-4 w-4" />
     Stacks
   </a>
   <a href="/users" use:link class={navInactiveClass}>
