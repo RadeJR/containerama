@@ -1,24 +1,17 @@
-package handlers
+package api
 
 import (
 	"database/sql"
 	"net/http"
 
-	"github.com/RadeJR/containerama/components"
-	compusers "github.com/RadeJR/containerama/components/users"
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/models"
 	"github.com/RadeJR/containerama/services"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var Headers = []string{"ID", "Username", "Full Name", "Email", "Role", "Created at"}
-
-type UserHandler struct{}
-
-func (h UserHandler) CreateUser(c echo.Context) error {
+func CreateUser(c echo.Context) error {
 	type userData struct {
 		Username  string `form:"username" validate:"required,alphanum"`
 		Password  string `form:"password" validate:"required"`
@@ -69,46 +62,14 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, "User wasn't created")
 	}
 
-	return c.Redirect(302, "/users")
+	return c.JSON(http.StatusCreated, "User created")
 }
 
-func (h UserHandler) CreateUserForm(c echo.Context) error {
-	return Render(c, 200, compusers.CreateUserForm())
-}
-
-func (h UserHandler) ShowUsers(c echo.Context) error {
-	sess, err := session.Get("session", c)
-	if err != nil {
-		return err
-	}
-	role := sess.Values["role"].(string)
-
-	page, size, err := GetPaginationInfo(c)
-	if err != nil {
-		return err
-	}
+func ShowUsers(c echo.Context) error {
 	users := []models.User{}
-	err = db.DB.Select(&users, "SELECT * FROM users LIMIT 10")
+	err := db.DB.Select(&users, "SELECT * FROM users")
 	if err != nil {
 		return err
 	}
-	var count int64
-	err = db.DB.Get(&count, "SELECT count(*) FROM users")
-	if err != nil {
-		return err
-	}
-	tableData := components.TableData{
-		Rows: make([]components.RowData, len(users)),
-	}
-	tableData.Headers = Headers
-	for k,v := range users {
-		tableData.Rows[k] = services.NewUserRowData(v)
-	}
-
-	// Rendering response
-	if c.Request().Header.Get("HX-Request") != "true" {
-		return Render(c, 200, compusers.PageFull(tableData, page, size, int(count), role))
-	} else {
-		return Render(c, 200, compusers.Page(tableData, page, size, int(count), role))
-	}
+	return c.JSON(http.StatusOK, users)
 }

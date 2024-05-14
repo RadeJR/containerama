@@ -2,14 +2,11 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/RadeJR/containerama/components"
-	"github.com/RadeJR/containerama/components/containers"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
@@ -62,12 +59,12 @@ func StopContainer(id string) error {
 	return nil
 }
 
-func CreateContainer(data ContainerData) error {
+func CreateContainer(data ContainerData) (string, error) {
 	ctx := context.Background()
 
 	reader, err := cli.ImagePull(ctx, data.Image, types.ImagePullOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
 	io.Copy(os.Stdout, reader)
 
@@ -75,7 +72,7 @@ func CreateContainer(data ContainerData) error {
 	if data.Ports != "" {
 		_, ports, err = nat.ParsePortSpecs(strings.Split(data.Ports, "\n"))
 		if err != nil {
-			return err
+			return "", err
 		}
 	} else {
 		ports = nil
@@ -122,14 +119,14 @@ func CreateContainer(data ContainerData) error {
 	}, nil, nil, data.Name)
 	if err != nil {
 		RemoveContainer(resp.ID, true)
-		return err
+		return "", err
 	}
 
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return resp.ID, nil
 }
 
 // Funciton that starts the container
@@ -185,41 +182,8 @@ func EditContainer(id string, data ContainerData) error {
 	if err := RemoveContainer(id, true); err != nil {
 		return err
 	}
-	if err := CreateContainer(data); err != nil {
+	if _, err := CreateContainer(data); err != nil {
 		return err
 	}
 	return nil
-}
-
-func NewRowData(container types.Container) components.RowData {
-	rowData := components.RowData{
-		Fields: make([]string, 7),
-	}
-
-	rowData.Fields[0] = container.ID[:10]
-	rowData.Fields[1] = container.Image
-	var names string = ""
-	for _, v := range container.Names {
-		names = fmt.Sprint(names, v)
-	}
-	rowData.Fields[2] = names
-	var ports string = ""
-	for _,v := range container.Ports {
-		ports = fmt.Sprintf("%v %v:%v -> %v;",ports, v.IP, v.PublicPort, v.PrivatePort)
-	}
-	rowData.Fields[3] = ports
-
-	builder := new(strings.Builder)
-	status := containers.Status(container)
-	status.Render(context.Background(), builder)
-	rowData.Fields[4] = builder.String()
-
-	rowData.Fields[5] = time.Unix(container.Created, 0).Format(time.ANSIC)
-
-	builder = new(strings.Builder)
-	controls := containers.Controls(container)
-	controls.Render(context.Background(), builder)
-	rowData.Fields[6] = builder.String()
-
-	return rowData
 }

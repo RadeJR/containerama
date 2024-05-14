@@ -5,9 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"time"
 
-	"github.com/RadeJR/containerama/components"
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/models"
 	"github.com/sethvargo/go-password/password"
@@ -73,26 +71,4 @@ func GetUserByUsername(username string) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
-}
-
-func NewUserRowData(user models.User) components.RowData {
-	rowData := components.RowData{
-		Fields: make([]string, 6),
-	}
-
-	rowData.Fields[0] = fmt.Sprint(user.ID)
-	rowData.Fields[1] = user.Username
-	if user.LastName.Valid {
-		rowData.Fields[2] = fmt.Sprintf("%v %v", user.FirstName, user.LastName.String)
-	} else {
-		rowData.Fields[2] = user.FirstName
-	}
-	if user.Email.Valid {
-		rowData.Fields[3] = user.Email.String
-	} else {
-		rowData.Fields[3] = "N/A"
-	}
-	rowData.Fields[4] = user.Role
-	rowData.Fields[5] = user.CreatedAt.Format(time.ANSIC)
-	return rowData
 }

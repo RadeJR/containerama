@@ -33,8 +33,7 @@ func main() {
 	app := echo.New()
 	app.HTTPErrorHandler = handlers.CustomHTTPErrorHandler
 	// STATIC
-	app.Static("/", "assets")
-	app.Static("/svelte", "frontend/dist")
+	app.Static("/", "frontend/dist")
 
 	// session middleware
 	store, err := sqlitestore.NewSqliteStoreFromConnection(db.DB, "sessions", "/", 3600, []byte(os.Getenv("SESSION_SECRET")))
@@ -43,52 +42,6 @@ func main() {
 	}
 	app.Use(session.Middleware(store))
 
-	// LOGIN
-	loginHandler := handlers.LoginHandler{}
-	app.GET("/login", loginHandler.ShowLoginPage)
-	app.POST("/login", loginHandler.Login)
-	app.GET("/logout", loginHandler.Logout)
-
-	// USER
-	userHandler := handlers.UserHandler{}
-	users := app.Group("/users", middleware.ValidateSession, middleware.OnlyAdmin)
-	users.GET("", userHandler.ShowUsers)
-	users.POST("", userHandler.CreateUser)
-	users.GET("/create", userHandler.CreateUserForm)
-
-	// DOCKER
-	dockerHandler := handlers.DockerHandler{}
-	// Containers is default page
-	app.GET("/", dockerHandler.GetContainers, middleware.ValidateSession)
-
-	// CONTAINERS
-	containers := app.Group("/containers", middleware.ValidateSession)
-	containers.GET("", dockerHandler.GetContainers)
-	containers.GET("/create", dockerHandler.CreateContainerPage)
-	containers.POST("/create", dockerHandler.CreateContainer)
-	containers.GET("/stop/:id", dockerHandler.StopContainer)
-	containers.GET("/start/:id", dockerHandler.StartContainer)
-	containers.GET("/restart/:id", dockerHandler.RestartContainer)
-	containers.GET("/remove/:id", dockerHandler.RemoveContainer)
-	containers.GET(":id", dockerHandler.ShowContainer)
-	containers.GET("/edit/:id", dockerHandler.EditContainerPage)
-	containers.POST("/edit/:id", dockerHandler.EditContainer)
-	// NETWORKS
-	networkHandler := handlers.NetworkHandler{}
-	networks := app.Group("/networks", middleware.ValidateSession)
-	networks.GET("", networkHandler.ShowNetworks, middleware.ValidateSession)
-	// networks.GET("/create", dockerHandler.CreateNetworkPage)
-	// networks.POST("/create", dockerHandler.CreateNetwork)
-	// networks.GET("/remove/:id", dockerHandler.RemoveNetwork)
-	// networks.GET(":id", dockerHandler.ShowNetwork)
-
-
-	// STACKS
-	stackHandler := handlers.StackHandler{}
-	stacks := app.Group("/stacks", middleware.ValidateSession)
-	stacks.GET("", stackHandler.GetStacks)
-
-	
 	// API
 	api := app.Group("/api")
 	api.POST("/login", apihandlers.Login)
