@@ -2,20 +2,40 @@
   import Ellipsis from "lucide-svelte/icons/ellipsis";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import { Button } from "$lib/components/ui/button";
-    import type { AxiosResponse } from "axios";
-    import { getAxios } from "$conf/axios";
- 
+  import type { AxiosResponse } from "axios";
+  import { getAxios } from "$conf/axios";
+    import DropdownMenuSeparator from "$lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte";
+
   export let id: string;
+  export let state: string;
   export let updateTable: Function;
-  
+
   async function stopContainer() {
-    let result: AxiosResponse = await getAxios().put(`/api/containers/${id}`)
-    if (result.status == 200) {
-      updateTable()
+    let result: AxiosResponse = await getAxios().put(
+      `/api/containers/${id}/stop`,
+    );
+    if (result.status == 204) {
+      updateTable();
+    }
+  }
+  async function startContainer() {
+    let result: AxiosResponse = await getAxios().put(
+      `/api/containers/${id}/start`,
+    );
+    if (result.status == 204) {
+      updateTable();
+    }
+  }
+  async function removeContainer() {
+    let result: AxiosResponse = await getAxios().delete(
+      `/api/containers/${id}`,
+    );
+    if (result.status == 204) {
+      updateTable();
     }
   }
 </script>
- 
+
 <DropdownMenu.Root>
   <DropdownMenu.Trigger asChild let:builder>
     <Button
@@ -34,15 +54,18 @@
       <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id)}>
         Copy container ID
       </DropdownMenu.Item>
-      <DropdownMenu.Item on:click={stopContainer}>
-        Stop container
-      </DropdownMenu.Item>
-      <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id)}>
-        Remove container
-      </DropdownMenu.Item>
+      {#if state == "running"}
+        <DropdownMenu.Item on:click={stopContainer}>
+          Stop container
+        </DropdownMenu.Item>
+      {:else}
+        <DropdownMenu.Item on:click={startContainer}>
+          Start container
+        </DropdownMenu.Item>
+        <DropdownMenu.Item on:click={removeContainer}>
+          Remove container
+        </DropdownMenu.Item>
+      {/if}
     </DropdownMenu.Group>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item>View customer</DropdownMenu.Item>
-    <DropdownMenu.Item>View payment details</DropdownMenu.Item>
   </DropdownMenu.Content>
 </DropdownMenu.Root>

@@ -34,7 +34,7 @@
   }
 </script>
 
-<nav class="grid items-start px-2 text-sm font-medium lg:px-4">
+<nav class="pt-2 grid items-start px-2 text-sm font-medium lg:px-4">
   <a href="/containers" use:link class={navInactiveClass}>
     <Package class="h-4 w-4" />
     Containers

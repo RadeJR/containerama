@@ -33,7 +33,11 @@ func main() {
 	app := echo.New()
 	app.HTTPErrorHandler = handlers.CustomHTTPErrorHandler
 	// STATIC
-	app.Static("/", "frontend/dist")
+	if os.Getenv("APP_ENV") == "local" {
+		app.Static("/", "../frontend/dist")
+	} else {
+		app.Static("/", "public")
+	}
 
 	// session middleware
 	store, err := sqlitestore.NewSqliteStoreFromConnection(db.DB, "sessions", "/", 3600, []byte(os.Getenv("SESSION_SECRET")))
@@ -49,7 +53,9 @@ func main() {
 
 	apicontainers := api.Group("/containers", middleware.ValidateSession)
 	apicontainers.GET("", apihandlers.GetContainers)
-	apicontainers.PUT("/:id", apihandlers.StopContainer)
+	apicontainers.PUT("/:id/stop", apihandlers.StopContainer)
+	apicontainers.PUT("/:id/start", apihandlers.StartContainer)
+	apicontainers.DELETE("/:id", apihandlers.RemoveContainer)
 
 	app.Start(os.Getenv("BIND_ADDR"))
 }

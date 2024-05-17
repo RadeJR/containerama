@@ -20,7 +20,7 @@ func StopContainer(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 func CreateContainer(c echo.Context) error {

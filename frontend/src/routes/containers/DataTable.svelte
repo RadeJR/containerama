@@ -152,8 +152,12 @@
     table.column({
       accessor: ({ Id }) => Id,
       header: "",
-      cell: ({ value }) => {
-        return createRender(DataTableActions, { id: value, updateTable: getData });
+      cell: ({ row, value }) => {
+        return createRender(DataTableActions, {
+          id: value,
+          updateTable: getData,
+          state: $containers[parseInt(row.id)].State,
+        });
       },
       plugins: {
         sort: {
