@@ -56,6 +56,7 @@ func main() {
 	apicontainers.PUT("/:id/stop", apihandlers.StopContainer)
 	apicontainers.PUT("/:id/start", apihandlers.StartContainer)
 	apicontainers.DELETE("/:id", apihandlers.RemoveContainer)
+	apicontainers.GET("/:id/logs", apihandlers.ContainerLogs)
 
 	app.Start(os.Getenv("BIND_ADDR"))
 }

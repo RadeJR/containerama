@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/RadeJR/containerama/services"
@@ -92,4 +94,21 @@ func EditContainer(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusCreated, c.Param("id"))
+}
+
+func ContainerLogs(c echo.Context) error {
+	log.Printf("SSE client connected, ip: %v", c.RealIP())
+
+	w := c.Response()
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	go func() {
+		<-c.Request().Context().Done()
+		slog.Info("Client disconected", "ip", c.RealIP())
+		return
+	}()
+
+	return services.ContainerLogs(c.Param("id"), *w)
 }

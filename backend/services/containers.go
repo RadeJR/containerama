@@ -1,15 +1,21 @@
 package services
 
 import (
+	"bufio"
 	"context"
+	"encoding/binary"
+	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/go-connections/nat"
+	"github.com/labstack/echo/v4"
 )
 
 type ContainerData struct {
@@ -35,7 +41,7 @@ func PaginateContainers(cont []types.Container, page int, size int) []types.Cont
 }
 
 func GetContainers() ([]types.Container, error) {
-	cont, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +68,7 @@ func StopContainer(id string) error {
 func CreateContainer(data ContainerData) (string, error) {
 	ctx := context.Background()
 
-	reader, err := cli.ImagePull(ctx, data.Image, types.ImagePullOptions{})
+	reader, err := cli.ImagePull(ctx, data.Image, image.PullOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -122,7 +128,7 @@ func CreateContainer(data ContainerData) (string, error) {
 		return "", err
 	}
 
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
 		return "", err
 	}
 
@@ -131,7 +137,7 @@ func CreateContainer(data ContainerData) (string, error) {
 
 // Funciton that starts the container
 func StartContainer(id string) error {
-	if err := cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{}); err != nil {
+	if err := cli.ContainerStart(context.Background(), id, container.StartOptions{}); err != nil {
 		return err
 	}
 	return nil
@@ -147,7 +153,7 @@ func RestartContainer(id string) error {
 // function that deletes the container
 func RemoveContainer(id string, force bool) error {
 	statusCh, errCh := cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
-	if err := cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{
+	if err := cli.ContainerRemove(context.Background(), id, container.RemoveOptions{
 		Force: force,
 	}); err != nil {
 		return err
@@ -184,6 +190,52 @@ func EditContainer(id string, data ContainerData) error {
 	}
 	if _, err := CreateContainer(data); err != nil {
 		return err
+	}
+	return nil
+}
+
+func ContainerLogs(id string, w echo.Response) error {
+	reader, err := cli.ContainerLogs(context.Background(), id, container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Tail: "all"})
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	header := make([]byte, 8)
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		// Read the 8-byte header
+		_, err := reader.Read(header)
+		slog.Info("Header read")
+		if err != nil {
+			fmt.Println("Error reading log header:", err)
+			return err
+		}
+
+		// Parse the header
+		// streamType := header[0]
+		payloadLength := binary.BigEndian.Uint32(header[4:8])
+
+		// Read the payload
+		payload := make([]byte, payloadLength)
+		_, err = io.ReadFull(reader, payload)
+		if err != nil {
+			fmt.Println("Error reading log payload:", err)
+			return err
+		}
+
+		slog.Info("Payload", "data", payload)
+		event := Event{
+			Data: []byte(payload),
+		}
+		if err := event.MarshalTo(w.Writer); err != nil {
+			return err
+		}
+		w.Flush()
+
+		if err := scanner.Err(); err != nil {
+			fmt.Println("Error reading logs:", err)
+		}
 	}
 	return nil
 }

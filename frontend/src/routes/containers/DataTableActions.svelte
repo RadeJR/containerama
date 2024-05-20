@@ -4,7 +4,6 @@
   import { Button } from "$lib/components/ui/button";
   import type { AxiosResponse } from "axios";
   import { getAxios } from "$conf/axios";
-    import DropdownMenuSeparator from "$lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte";
 
   export let id: string;
   export let state: string;
@@ -43,6 +42,9 @@
       builders={[builder]}
       size="icon"
       class="relative h-8 w-8 p-0"
+      on:click={(e) => {
+        e.stopPropagation();
+      }}
     >
       <span class="sr-only">Open menu</span>
       <Ellipsis class="h-4 w-4" />

@@ -24,6 +24,7 @@
   import ChevronDown from "lucide-svelte/icons/chevron-down";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import DataTableCheckbox from "./DataTableCheckbox.svelte";
+  import { push } from "svelte-spa-router";
 
   type Container = {
     Id: string;
@@ -255,6 +256,11 @@
             <Table.Row
               {...rowAttrs}
               data-state={$selectedDataIds[row.id] && "selected"}
+              on:click={(event) => {
+                event.stopImmediatePropagation();
+                push("/containers/" + $containers[+row.id].Id.slice(0, 10));
+              }}
+              class="cursor-pointer"
             >
               {#each row.cells as cell (cell.id)}
                 <Subscribe attrs={cell.attrs()} let:attrs>
