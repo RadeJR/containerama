@@ -1,7 +1,7 @@
 package api
 
 import (
-	"log"
+	"context"
 	"log/slog"
 	"net/http"
 
@@ -97,18 +97,33 @@ func EditContainer(c echo.Context) error {
 }
 
 func ContainerLogs(c echo.Context) error {
-	log.Printf("SSE client connected, ip: %v", c.RealIP())
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	logCh := make(chan string, 100)
+	slog.Info("SSE client connected", "ip", c.RealIP())
 
 	w := c.Response()
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	go func() {
-		<-c.Request().Context().Done()
-		slog.Info("Client disconected", "ip", c.RealIP())
-		return
-	}()
+	go services.ContainerLogs(ctx, c.Param("id"), logCh)
 
-	return services.ContainerLogs(c.Param("id"), *w)
+	for {
+		select {
+		case <-c.Request().Context().Done():
+			slog.Info("SSE client disconnected", "ip", c.RealIP())
+			cancel()
+			return nil
+		case payload := <-logCh:
+			event := services.Event{
+				Data: []byte(payload),
+			}
+			if err := event.MarshalTo(w); err != nil {
+				return err
+			}
+			w.Flush()
+		}
+	}
 }

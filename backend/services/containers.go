@@ -1,12 +1,10 @@
 package services
 
 import (
-	"bufio"
 	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log/slog"
 	"os"
 	"strings"
 	"time"
@@ -15,7 +13,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/go-connections/nat"
-	"github.com/labstack/echo/v4"
 )
 
 type ContainerData struct {
@@ -194,48 +191,49 @@ func EditContainer(id string, data ContainerData) error {
 	return nil
 }
 
-func ContainerLogs(id string, w echo.Response) error {
-	reader, err := cli.ContainerLogs(context.Background(), id, container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Tail: "all"})
+func ContainerLogs(ctx context.Context, id string, logCh chan string) {
+	defer close(logCh)
+
+	reader, err := cli.ContainerLogs(ctx, id, container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Tail: "all"})
 	if err != nil {
-		return err
+		return
 	}
 	defer reader.Close()
 
 	header := make([]byte, 8)
-	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() {
-		// Read the 8-byte header
-		_, err := reader.Read(header)
-		slog.Info("Header read")
-		if err != nil {
-			fmt.Println("Error reading log header:", err)
-			return err
-		}
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			// Read the 8-byte header
+			_, err := reader.Read(header)
+			if err != nil {
+				return
+			}
 
-		// Parse the header
-		// streamType := header[0]
-		payloadLength := binary.BigEndian.Uint32(header[4:8])
+			// Parse the header
+			streamType := header[0]
+			var prefix string
+			switch streamType {
+			case 1:
+				prefix = "OUT"
+			default:
+				prefix = "ERR"
 
-		// Read the payload
-		payload := make([]byte, payloadLength)
-		_, err = io.ReadFull(reader, payload)
-		if err != nil {
-			fmt.Println("Error reading log payload:", err)
-			return err
-		}
+			}
+			payloadLength := binary.BigEndian.Uint32(header[4:8])
 
-		slog.Info("Payload", "data", payload)
-		event := Event{
-			Data: []byte(payload),
-		}
-		if err := event.MarshalTo(w.Writer); err != nil {
-			return err
-		}
-		w.Flush()
+			// Read the payload
+			payload := make([]byte, payloadLength)
+			_, err = io.ReadFull(reader, payload)
+			if err != nil {
+				fmt.Println("Error reading log payload:", err)
+				return
+			}
 
-		if err := scanner.Err(); err != nil {
-			fmt.Println("Error reading logs:", err)
+			// slog.Info("Payload", "data", payload)
+			logCh <- prefix+string(payload)
 		}
 	}
-	return nil
 }

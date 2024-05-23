@@ -4,6 +4,7 @@
   import { Button } from "$lib/components/ui/button";
   import type { AxiosResponse } from "axios";
   import { getAxios } from "$conf/axios";
+  import { push } from "svelte-spa-router";
 
   export let id: string;
   export let state: string;
@@ -32,6 +33,10 @@
     if (result.status == 204) {
       updateTable();
     }
+  }
+  function showLogs(e: Event) {
+    e.preventDefault();
+    push(`/containers/${id}/logs`);
   }
 </script>
 
@@ -68,6 +73,7 @@
           Remove container
         </DropdownMenu.Item>
       {/if}
+      <DropdownMenu.Item on:click={showLogs}>Show logs</DropdownMenu.Item>
     </DropdownMenu.Group>
   </DropdownMenu.Content>
 </DropdownMenu.Root>
