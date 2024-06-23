@@ -24,6 +24,7 @@
   import ChevronDown from "lucide-svelte/icons/chevron-down";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import DataTableCheckbox from "./DataTableCheckbox.svelte";
+  import { push } from "svelte-spa-router";
 
   type Container = {
     Id: string;
@@ -196,29 +197,37 @@
 </script>
 
 <div>
-  <div class="flex items-center py-4">
+  <div class="flex items-center justify-between py-4">
     <Input
       class="max-w-sm"
       placeholder="Filter table..."
       type="text"
       bind:value={$filterValue}
     />
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild let:builder>
-        <Button variant="outline" class="ml-auto" builders={[builder]}>
-          Columns <ChevronDown class="ml-2 h-4 w-4" />
-        </Button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        {#each flatColumns as col}
-          {#if hidableCols.includes(col.id)}
-            <DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
-              {col.header}
-            </DropdownMenu.CheckboxItem>
-          {/if}
-        {/each}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+    <div>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild let:builder>
+          <Button variant="outline" class="ml-auto" builders={[builder]}>
+            Columns <ChevronDown class="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          {#each flatColumns as col}
+            {#if hidableCols.includes(col.id)}
+              <DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
+                {col.header}
+              </DropdownMenu.CheckboxItem>
+            {/if}
+          {/each}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+      <Button
+        variant="outline"
+        on:click={() => {
+          push("/containers/create");
+        }}>Create Container</Button
+      >
+    </div>
   </div>
   <div class="rounded-md border">
     <Table.Root {...$tableAttrs}>

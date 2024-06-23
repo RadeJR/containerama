@@ -66,7 +66,7 @@ func StopContainer(id string) error {
 	return nil
 }
 
-func CreateContainer(data ContainerData) (string, error) {
+func CreateContainer(data ContainerData, userID string) (string, error) {
 	ctx := context.Background()
 
 	reader, err := cli.ImagePull(ctx, data.Image, image.PullOptions{})
@@ -113,12 +113,17 @@ func CreateContainer(data ContainerData) (string, error) {
 		volumes = nil
 	}
 
+	labels := parseLabelString(data.Labels)
+	if userID != "" {
+		labels["owner"] = userID
+	}
+
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image:           data.Image,
 		Env:             env,
 		Cmd:             cmd,
 		Entrypoint:      entrypoint,
-		Labels:          parseLabelString(data.Labels),
+		Labels:          labels,
 		NetworkDisabled: data.NetworkDisabled,
 	}, &container.HostConfig{
 		Binds:        volumes,
@@ -189,7 +194,7 @@ func EditContainer(id string, data ContainerData) error {
 	if err := RemoveContainer(id, true); err != nil {
 		return err
 	}
-	if _, err := CreateContainer(data); err != nil {
+	if _, err := CreateContainer(data, ""); err != nil {
 		return err
 	}
 	return nil

@@ -26,6 +26,8 @@
   "dependencies": {
     "axios": "^1.6.8",
     "bits-ui": "^0.21.7",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "clsx": "^2.1.1",
     "lucide-svelte": "^0.378.0",
     "mode-watcher": "^0.3.0",

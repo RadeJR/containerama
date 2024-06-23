@@ -33,6 +33,9 @@ func StopContainer(c echo.Context) error {
 }
 
 func CreateContainer(c echo.Context) error {
+	claims := c.Get("user").(*types.ZitadelClaims)
+	userID := claims.Subject
+
 	var data services.ContainerData
 	err := c.Bind(&data)
 	if err != nil {
@@ -45,7 +48,7 @@ func CreateContainer(c echo.Context) error {
 	}
 
 	var id string
-	id, err = services.CreateContainer(data)
+	id, err = services.CreateContainer(data, userID)
 	if err != nil {
 		return err
 	}
