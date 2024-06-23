@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 
 	"github.com/RadeJR/containerama/services"
@@ -101,7 +100,6 @@ func ContainerLogs(c echo.Context) error {
 	defer cancel()
 
 	logCh := make(chan string, 100)
-	slog.Info("SSE client connected", "ip", c.RealIP())
 
 	w := c.Response()
 	w.Header().Set("Content-Type", "text/event-stream")
@@ -113,7 +111,6 @@ func ContainerLogs(c echo.Context) error {
 	for {
 		select {
 		case <-c.Request().Context().Done():
-			slog.Info("SSE client disconnected", "ip", c.RealIP())
 			cancel()
 			return nil
 		case payload := <-logCh:

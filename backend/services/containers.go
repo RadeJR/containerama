@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -227,11 +226,9 @@ func ContainerLogs(ctx context.Context, id string, logCh chan string) {
 			payload := make([]byte, payloadLength)
 			_, err = io.ReadFull(reader, payload)
 			if err != nil {
-				fmt.Println("Error reading log payload:", err)
 				return
 			}
 
-			// slog.Info("Payload", "data", payload)
 			logCh <- prefix+string(payload)
 		}
 	}

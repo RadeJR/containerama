@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -73,7 +72,6 @@ func CallbackHandler(c echo.Context) error {
 	}
 
 	rawIdToken := token.Extra("id_token").(string)
-	slog.Info("raw token", "raw_token", rawIdToken)
 
 	cookie := new(http.Cookie)
 	cookie.Name = "access_token"

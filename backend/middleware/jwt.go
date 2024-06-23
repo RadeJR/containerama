@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -15,7 +14,6 @@ var k keyfunc.Keyfunc
 func InitializeKeyFunc() {
 	var err error
 	k, err = keyfunc.NewDefault([]string{os.Getenv("JWKS_URL")})
-	fmt.Println(os.Getenv("JWKS_URL"))
 	if err != nil {
 		log.Fatalf("Failed to create a keyfunc.Keyfunc from the server's URL.\nError: %s", err)
 	}
@@ -29,7 +27,6 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		token, err := jwt.Parse(cookie.Value, k.Keyfunc)
 		if err != nil || !token.Valid {
-			fmt.Println(err)
 			return echo.ErrUnauthorized
 		}
 
@@ -37,7 +34,6 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if !ok || !token.Valid {
 			return echo.ErrUnauthorized
 		}
-		fmt.Println(claims["urn:zitadel:iam:org:project:272020644114202627:roles"])
 
 		c.Set("user", claims)
 		return next(c)
