@@ -6,5 +6,5 @@ export const routes = {
   // Exact path
   "/": Home,
   "/containers": Containers,
-  "/containers/:id/logs": Logging
+  "/containers/:id/logs": Logging,
 };

@@ -15,7 +15,6 @@ function configureAxios(): AxiosInstance {
 
   customaxios.interceptors.response.use(null, function(error) {
     if (error.response.status == 401) {
-      console.log("Unauthorized, setting to false");
       isAuthorized.set(false);
     }
     return Promise.reject(error);

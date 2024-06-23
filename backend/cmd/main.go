@@ -8,6 +8,7 @@ import (
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/handlers"
 	apihandlers "github.com/RadeJR/containerama/handlers/api"
+	"github.com/RadeJR/containerama/handlers/auth"
 	"github.com/RadeJR/containerama/middleware"
 	"github.com/RadeJR/containerama/services"
 	"github.com/joho/godotenv"
@@ -25,6 +26,8 @@ func init() {
 	services.InitializeCient()
 	services.InitializeValidator()
 	services.EnsureAdminUserExists()
+	auth.InitializeOauth()
+	middleware.InitializeKeyFunc()
 }
 
 func main() {
@@ -46,12 +49,14 @@ func main() {
 	}
 	app.Use(session.Middleware(store))
 
-	// API
-	api := app.Group("/api")
-	api.POST("/login", apihandlers.Login)
-	api.GET("/logout", apihandlers.Logout)
+	app.GET("/login", auth.LoginHandler)
+	app.GET("/callback", auth.CallbackHandler)
 
-	apicontainers := api.Group("/containers", middleware.ValidateSession)
+	// API
+	api := app.Group("/api", middleware.JWTMiddleware)
+	api.GET("/userinfo", auth.LoginCheckHandler)
+
+	apicontainers := api.Group("/containers", middleware.JWTMiddleware)
 	apicontainers.GET("", apihandlers.GetContainers)
 	apicontainers.PUT("/:id/stop", apihandlers.StopContainer)
 	apicontainers.PUT("/:id/start", apihandlers.StartContainer)

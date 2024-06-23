@@ -7,12 +7,29 @@
   import Login from "$lib/components/Login.svelte";
   import Base from "$lib/components/Base.svelte";
   import { routes } from "$app/routes";
-  import { cookieExists } from "$services/auth";
   import { isAuthorized } from "$store";
+  import { onMount } from "svelte";
+  import { getAxios } from "$conf/axios";
+  let user: any;
 
-  if (cookieExists("session")) {
-    isAuthorized.set(true);
+  async function checkIfLoggedIn() {
+    try {
+      await getAxios()
+        .get("/api/userinfo")
+        .then((response) => {
+          user = response.data;
+          isAuthorized.set(true)
+        });
+    } catch (err) {
+      console.log("error fetching user data: " + err);
+    }
   }
+
+  onMount(() => {
+    checkIfLoggedIn().then(() => {
+      console.log(user);
+    });
+  });
 </script>
 
 <ModeWatcher />

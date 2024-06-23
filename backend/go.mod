@@ -5,9 +5,13 @@ go 1.22
 toolchain go1.22.2
 
 require (
+	github.com/MicahParks/keyfunc/v3 v3.3.3
+	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/docker/docker v26.1.3+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/go-playground/validator/v10 v10.20.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/uuid v1.6.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.15.0
@@ -17,15 +21,18 @@ require (
 	github.com/pressly/goose/v3 v3.20.0
 	github.com/sethvargo/go-password v0.3.0
 	golang.org/x/crypto v0.21.0
+	golang.org/x/oauth2 v0.20.0
 )
 
 require (
+	github.com/MicahParks/jwkset v0.5.18 // indirect
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

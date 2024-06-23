@@ -220,7 +220,6 @@ func ContainerLogs(ctx context.Context, id string, logCh chan string) {
 				prefix = "OUT"
 			default:
 				prefix = "ERR"
-
 			}
 			payloadLength := binary.BigEndian.Uint32(header[4:8])
 
