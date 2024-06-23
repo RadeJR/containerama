@@ -7,8 +7,7 @@ CREATE TABLE repositories (
     name text NOT NULL,
     encrypted_token text,
     url text NOT NULL,
-    user_id int NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    user_id text NOT NULL
 );
 -- +goose StatementEnd
 

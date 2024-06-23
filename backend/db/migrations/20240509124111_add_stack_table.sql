@@ -8,9 +8,8 @@ CREATE TABLE stacks (
     path_to_file text NOT NULL,
     webhook text,
     branch text NOT NULL,
-    user_id int NOT NULL,
+    user_id text NOT NULL,
     repository_id int NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES user(id)
     FOREIGN KEY(repository_id) REFERENCES repositories(id)
 );
 -- +goose StatementEnd

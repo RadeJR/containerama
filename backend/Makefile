@@ -12,3 +12,6 @@ migrate:
 
 migrate-down:
 	@goose -dir db/migrations sqlite3 ./data/db.sqlite3 down
+
+migrate-reset:
+	@goose -dir db/migrations sqlite3 ./data/db.sqlite3 reset
