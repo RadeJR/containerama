@@ -3,7 +3,7 @@ package services
 import (
 
 	"github.com/RadeJR/containerama/db"
-	"github.com/RadeJR/containerama/models"
+	"github.com/RadeJR/containerama/types"
 )
 
 func GetStacks(userID int, role string) ([]models.Stack, error) {

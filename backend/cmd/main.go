@@ -25,7 +25,6 @@ func init() {
 	db.InitializeDB()
 	services.InitializeCient()
 	services.InitializeValidator()
-	services.EnsureAdminUserExists()
 	auth.InitializeOauth()
 	middleware.InitializeKeyFunc()
 }

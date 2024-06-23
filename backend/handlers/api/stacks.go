@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/RadeJR/containerama/models"
+	"github.com/RadeJR/containerama/types"
 	"github.com/RadeJR/containerama/services"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
