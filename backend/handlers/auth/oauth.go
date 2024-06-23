@@ -101,7 +101,26 @@ func LoginCheckHandler(c echo.Context) error {
 		FamilyName string `json:"family_name"`
 		Username   string `json:"preferred_username"`
 		Email      string `json:"email"`
+		Picture    string `json:"picture"`
 	}
 	idToken.Claims(&claims)
 	return c.JSON(http.StatusOK, claims)
+}
+
+func LogoutHandler(c echo.Context) error {
+	cookie := new(http.Cookie)
+	cookie.Name = "access_token"
+	cookie.Value = ""
+	cookie.MaxAge = -1
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
+
+	cookie = new(http.Cookie)
+	cookie.Name = "id_token"
+	cookie.Value = ""
+	cookie.MaxAge = -1
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
+
+	return c.Redirect(http.StatusTemporaryRedirect, "/")
 }

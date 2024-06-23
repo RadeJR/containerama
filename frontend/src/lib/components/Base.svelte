@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CircleUser from "lucide-svelte/icons/circle-user";
   import Menu from "lucide-svelte/icons/menu";
   import Package2 from "lucide-svelte/icons/package-2";
 
@@ -8,6 +7,22 @@
   import * as Sheet from "$lib/components/ui/sheet/index.js";
   import Nav from "$lib/components/Nav.svelte";
   import LightSwitch from "$lib/components/LightSwitch.svelte";
+  import { getAxios } from "$conf/axios";
+  import { isAuthorized } from "$store";
+  import { User } from "$app/types/user";
+  import { CircleUser } from "lucide-svelte";
+
+  export let user: User;
+
+  async function logout() {
+    await getAxios()
+      .get("/logout")
+      .then(() => {
+        isAuthorized.set(false);
+      });
+  }
+
+  $: console.log(user.picture);
 </script>
 
 <div
@@ -46,7 +61,7 @@
           <Nav />
         </Sheet.Content>
       </Sheet.Root>
-      <div class="ml-auto">
+      <div class="ml-auto flex gap-2">
         <LightSwitch />
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild let:builder>
@@ -56,7 +71,11 @@
               size="icon"
               class="rounded-full"
             >
-              <CircleUser class="h-5 w-5" />
+              {#if user.picture}
+                <img src={user.picture} alt="profile-pic" />
+              {:else}
+                <CircleUser class="h-5 w-5" />
+              {/if}
               <span class="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenu.Trigger>
@@ -66,7 +85,7 @@
             <DropdownMenu.Item>Settings</DropdownMenu.Item>
             <DropdownMenu.Item>Support</DropdownMenu.Item>
             <DropdownMenu.Separator />
-            <DropdownMenu.Item>Logout</DropdownMenu.Item>
+            <DropdownMenu.Item on:click={logout}>Log Out</DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>

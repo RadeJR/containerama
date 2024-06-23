@@ -50,6 +50,7 @@ func main() {
 
 	app.GET("/login", auth.LoginHandler)
 	app.GET("/callback", auth.CallbackHandler)
+	app.GET("/logout", auth.LogoutHandler)
 
 	// API
 	api := app.Group("/api", middleware.JWTMiddleware)

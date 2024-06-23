@@ -10,7 +10,8 @@
   import { isAuthorized } from "$store";
   import { onMount } from "svelte";
   import { getAxios } from "$conf/axios";
-  let user: any;
+  import { User } from "$app/types/user";
+  let user: User;
 
   async function checkIfLoggedIn() {
     try {
@@ -18,7 +19,7 @@
         .get("/api/userinfo")
         .then((response) => {
           user = response.data;
-          isAuthorized.set(true)
+          isAuthorized.set(true);
         });
     } catch (err) {
       console.log("error fetching user data: " + err);
@@ -26,15 +27,13 @@
   }
 
   onMount(() => {
-    checkIfLoggedIn().then(() => {
-      console.log(user);
-    });
+    checkIfLoggedIn();
   });
 </script>
 
 <ModeWatcher />
 {#if $isAuthorized}
-  <Base>
+  <Base {user}>
     <Router {routes} />
   </Base>
 {:else}
