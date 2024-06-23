@@ -1,4 +1,4 @@
-package models
+package types
 
 type Repository struct {
 	Base

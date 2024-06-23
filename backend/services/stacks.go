@@ -6,8 +6,8 @@ import (
 	"github.com/RadeJR/containerama/types"
 )
 
-func GetStacks(userID int, role string) ([]models.Stack, error) {
-	var stacks []models.Stack
+func GetStacks(userID int, role string) ([]types.Stack, error) {
+	var stacks []types.Stack
 	var err error
 
 	if role == "admin" {

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/MicahParks/keyfunc/v3"
+	"github.com/RadeJR/containerama/types"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
@@ -25,12 +26,12 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.ErrUnauthorized
 		}
-		token, err := jwt.Parse(cookie.Value, k.Keyfunc)
+		token, err := jwt.ParseWithClaims(cookie.Value, &types.ZitadelClaims{}, k.Keyfunc)
 		if err != nil || !token.Valid {
 			return echo.ErrUnauthorized
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
+		claims, ok := token.Claims.(*types.ZitadelClaims)
 		if !ok || !token.Valid {
 			return echo.ErrUnauthorized
 		}

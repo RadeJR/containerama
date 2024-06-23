@@ -5,11 +5,19 @@ import (
 	"net/http"
 
 	"github.com/RadeJR/containerama/services"
+	"github.com/RadeJR/containerama/types"
 	"github.com/labstack/echo/v4"
 )
 
 func GetContainers(c echo.Context) error {
-	cont, err := services.GetContainers()
+	claims := c.Get("user").(*types.ZitadelClaims)
+	userID := claims.Subject
+	isAdmin := false
+	if claims.Roles["admin"] != nil {
+		isAdmin = true
+	}
+
+	cont, err := services.GetContainers(userID, isAdmin)
 	if err != nil {
 		return err
 	}

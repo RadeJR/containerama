@@ -84,6 +84,7 @@ func CallbackHandler(c echo.Context) error {
 	cookie.Name = "id_token"
 	cookie.Value = rawIdToken
 	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.HttpOnly = true
 	c.SetCookie(cookie)
 
 	return c.Redirect(http.StatusTemporaryRedirect, "/")

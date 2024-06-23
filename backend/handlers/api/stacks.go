@@ -17,7 +17,7 @@ func GetStacks(c echo.Context) error {
 	role := sess.Values["role"].(string)
 	id := sess.Values["id"].(int)
 
-	stacks := []models.Stack{}
+	stacks := []types.Stack{}
 	stacks, err = services.GetStacks(id, role)
 	if err != nil {
 		return err

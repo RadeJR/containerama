@@ -10,6 +10,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/go-connections/nat"
 )
@@ -36,8 +37,12 @@ func PaginateContainers(cont []types.Container, page int, size int) []types.Cont
 	return cont[lower:upper]
 }
 
-func GetContainers() ([]types.Container, error) {
-	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
+func GetContainers(userID string, isAdmin bool) ([]types.Container, error) {
+	filterArgs := filters.NewArgs()
+	if !isAdmin {
+		filterArgs.Add("label", "owner="+userID)
+	}
+	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true, Filters: filterArgs})
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +234,7 @@ func ContainerLogs(ctx context.Context, id string, logCh chan string) {
 				return
 			}
 
-			logCh <- prefix+string(payload)
+			logCh <- prefix + string(payload)
 		}
 	}
 }
