@@ -9,6 +9,8 @@
 	import { getAxios } from "$conf/axios";
 	import { push } from "svelte-spa-router";
 
+	let toggleCompose: boolean = false;
+
 	let data: ContainerData = new ContainerData();
 	async function send() {
 		await getAxios()
@@ -22,7 +24,13 @@
 <div transition:fade={{ duration: 100 }}>
 	<div class="flex justify-between py-4">
 		<h4 class="text-lg font-medium">Create Container</h4>
-		<Button on:click={send} variant="outline">Create</Button>
+		<div class="flex gap-3">
+			<div class="flex items-center gap-2">
+				<Switch id="networking" bind:checked={toggleCompose} />
+				<Label for="networking">Use compose file</Label>
+			</div>
+			<Button on:click={send} variant="outline">Create</Button>
+		</div>
 	</div>
 	<div class="rounded-md border p-5">
 		<div class="flex my-1 gap-2">
@@ -79,11 +87,7 @@
 		</div>
 		<div class="my-1">
 			<Label for="env">Environment variables</Label>
-			<Textarea
-				id="env"
-				placeholder="key=value"
-				bind:value={data.env}
-			/>
+			<Textarea id="env" placeholder="key=value" bind:value={data.env} />
 		</div>
 		<div class="my-1">
 			<Label for="ports">Container ports</Label>
