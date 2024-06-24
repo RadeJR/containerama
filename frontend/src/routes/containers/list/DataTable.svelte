@@ -244,7 +244,7 @@
                 >
                   <Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
                     {#if cell.id === "Names" || cell.id === "Image" || cell.id === "State"}
-                      <Button variant="ghost" on:click={props.sort.toggle}>
+                      <Button class="px-0" variant="ghost" on:click={props.sort.toggle}>
                         <Render of={cell.render()} />
                         <ArrowUpDown class={"ml-2 h-4 w-4"} />
                       </Button>

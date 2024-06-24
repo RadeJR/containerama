@@ -25,38 +25,23 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import DataTableCheckbox from "./DataTableCheckbox.svelte";
   import { push } from "svelte-spa-router";
+  import { Stack } from "$app/types/stack";
 
-  type Container = {
-    Id: string;
-    Names: string[];
-    Image: string;
-    Created: string;
-    Ports: Port[];
-    State: string;
-  };
-
-  type Port = {
-    IP: string;
-    PrivatePort: number;
-    PublicPort: number;
-    Type: string;
-  };
-
-  let containers: Writable<Container[]> = writable([]);
+  let stacks: Writable<Stack[]> = writable([]);
 
   async function getData() {
     try {
-      let response: AxiosResponse = await getAxios().get("/api/containers");
-      $containers = response.data;
+      let response: AxiosResponse = await getAxios().get("/api/stacks");
+      $stacks = response.data;
     } catch (err) {
-      console.log("error fetching containers: " + err);
+      console.log("error fetching stacks: " + err);
     }
   }
   onMount(() => {
     getData();
   });
 
-  const table = createTable(containers, {
+  const table = createTable(stacks, {
     page: addPagination(),
     sort: addSortBy(),
     filter: addTableFilter({
@@ -101,18 +86,8 @@
       },
     }),
     table.column({
-      accessor: "Names",
-      header: "Names",
-      cell: ({ value }) => {
-        if (value.length == 1) {
-          return value[0].slice(1);
-        }
-        let result: string = "";
-        value.forEach((v) => {
-          result = result + v.slice(1) + "; ";
-        });
-        return result;
-      },
+      accessor: "Name",
+      header: "Name",
       plugins: {
         sort: {
           compareFn: compareNames,
@@ -120,44 +95,15 @@
       },
     }),
     table.column({
-      accessor: "Image",
-      header: "Image",
-    }),
-    table.column({
-      accessor: "Ports",
-      header: "Ports",
-      cell: ({ value }) => {
-        let result: string = "";
-        value.forEach((v) => {
-          result =
-            result + v.IP + ":" + v.PublicPort + "->" + v.PrivatePort + "; ";
-        });
-        return result;
-      },
-      plugins: {
-        sort: {
-          disable: true,
-        },
-        filter: {
-          exclude: true,
-        },
-      },
-    }),
-    table.column({
-      accessor: "State",
-      header: "State",
-      cell: ({ value }) => {
-        return value.toUpperCase();
-      },
+      accessor: "PathToFile",
+      header: "Path To File",
     }),
     table.column({
       accessor: ({ Id }) => Id,
       header: "",
-      cell: ({ row, value }) => {
+      cell: ({ value }) => {
         return createRender(DataTableActions, {
           id: value,
-          updateTable: getData,
-          state: $containers[parseInt(row.id)].State,
         });
       },
       plugins: {
@@ -224,8 +170,8 @@
       <Button
         variant="outline"
         on:click={() => {
-          push("/containers/create");
-        }}>Create Container</Button
+          push("/stacks/create");
+        }}>Create Stack</Button
       >
     </div>
   </div>

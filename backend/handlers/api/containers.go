@@ -6,6 +6,7 @@ import (
 
 	"github.com/RadeJR/containerama/services"
 	"github.com/RadeJR/containerama/types"
+	dockertypes "github.com/docker/docker/api/types"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,9 +18,18 @@ func GetContainers(c echo.Context) error {
 		isAdmin = true
 	}
 
-	cont, err := services.GetContainers(userID, isAdmin)
-	if err != nil {
-		return err
+	var cont []dockertypes.Container
+	var err error
+	if isAdmin {
+		cont, err = services.GetContainers()
+		if err != nil {
+			return err
+		}
+	} else {
+		cont, err = services.GetUserContainers(userID)
+		if err != nil {
+			return err
+		}
 	}
 	return c.JSON(http.StatusOK, cont)
 }

@@ -21,8 +21,6 @@
         isAuthorized.set(false);
       });
   }
-
-  $: console.log(user.picture);
 </script>
 
 <div

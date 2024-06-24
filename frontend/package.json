@@ -32,6 +32,7 @@
     "lucide-svelte": "^0.378.0",
     "mode-watcher": "^0.3.0",
     "oidc-client-ts": "^3.0.1",
+    "svelte-ace": "^1.0.21",
     "svelte-radix": "^1.1.0",
     "svelte-spa-router": "^4.0.1",
     "tailwind-merge": "^2.3.0",

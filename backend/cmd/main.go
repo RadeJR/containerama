@@ -64,5 +64,9 @@ func main() {
 	apicontainers.GET("/:id/logs", apihandlers.ContainerLogs)
 	apicontainers.POST("/create", apihandlers.CreateContainer)
 
+	apistacks := api.Group("/stacks", middleware.JWTMiddleware)
+	apistacks.GET("", apihandlers.GetStacks)
+	apistacks.POST("/createfromfile", apihandlers.CreateStackFromFileHandler)
+
 	app.Start(os.Getenv("BIND_ADDR"))
 }

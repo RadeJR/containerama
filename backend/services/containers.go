@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 	"time"
@@ -37,15 +38,37 @@ func PaginateContainers(cont []types.Container, page int, size int) []types.Cont
 	return cont[lower:upper]
 }
 
-func GetContainers(userID string, isAdmin bool) ([]types.Container, error) {
-	filterArgs := filters.NewArgs()
-	if !isAdmin {
-		filterArgs.Add("label", "owner="+userID)
+func GetContainers() ([]types.Container, error) {
+	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
+	if err != nil {
+		return nil, err
 	}
+	return cont, nil
+}
+
+func GetUserContainers(userID string) ([]types.Container, error) {
+	filterArgs := filters.NewArgs()
+	filterArgs.Add("label", "owner="+userID)
+	// get standalone containers
 	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true, Filters: filterArgs})
 	if err != nil {
 		return nil, err
 	}
+	stacks, err := GetStacks(userID, false)
+	if err != nil {
+		return nil, err
+	}
+	var stackFilter filters.Args
+	for _, v := range stacks {
+		stackFilter = filters.NewArgs()
+		stackFilter.Add("label", "com.docker.compose.project="+v.Name)
+		stackCont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true, Filters: stackFilter})
+		if err != nil {
+			slog.Error("Couldn't read stack containers", "error", err)
+		}
+		cont = append(cont, stackCont...)
+	}
+
 	return cont, nil
 }
 

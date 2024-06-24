@@ -5,105 +5,62 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { Switch } from "$lib/components/ui/switch/index.js";
-	import { ContainerData } from "$app/types/container";
+	import { StackFileData } from "$app/types/stack";
 	import { getAxios } from "$conf/axios";
 	import { push } from "svelte-spa-router";
 
-	let toggleCompose: boolean = false;
+	let useCompose: boolean = false;
 
-	let data: ContainerData = new ContainerData();
+	let data: StackFileData = new StackFileData();
 	async function send() {
-		await getAxios()
-			.post("/api/containers/create", data)
-			.then(() => {
-				push("/containers");
-			});
+		if (useCompose) {
+			await getAxios()
+				.post("/api/stacks/createfromfile", data)
+				.then(() => {
+					push("/stacks");
+				});
+		} else {
+			await getAxios()
+				.post("/api/stacks/createfromgit", data)
+				.then(() => {
+					push("/stacks");
+				});
+		}
 	}
 </script>
 
 <div transition:fade={{ duration: 100 }}>
 	<div class="flex justify-between py-4">
-		<h4 class="text-lg font-medium">Create Container</h4>
+		<h4 class="text-lg font-medium">Create Stack</h4>
 		<div class="flex gap-3">
 			<div class="flex items-center gap-2">
-				<Switch id="networking" bind:checked={toggleCompose} />
-				<Label for="networking">Use compose file</Label>
+				<Switch id="usecompose" bind:checked={useCompose} />
+				<Label for="usecompose">Use compose file</Label>
 			</div>
 			<Button on:click={send} variant="outline">Create</Button>
 		</div>
 	</div>
 	<div class="rounded-md border p-5">
-		<div class="flex my-1 gap-2">
-			<div class="flex-1">
-				<Label for="name">Container Name</Label>
-				<Input
-					id="name"
-					type="text"
-					placeholder="name"
-					bind:value={data.name}
-				/>
+		{#if useCompose}
+			<div class="flex flex-col my-1 gap-2">
+				<div class="flex-1">
+					<Label for="name">Stack Name</Label>
+					<Input
+						id="name"
+						type="text"
+						placeholder="name"
+						bind:value={data.name}
+					/>
+				</div>
+				<div class="flex-1">
+					<Label for="image">Content</Label>
+					<Textarea
+						id="image"
+						placeholder="services:"
+						bind:value={data.content}
+					/>
+				</div>
 			</div>
-			<div class="flex-1">
-				<Label for="image">Container image</Label>
-				<Input
-					id="image"
-					type="text"
-					placeholder="image"
-					bind:value={data.image}
-				/>
-			</div>
-		</div>
-		<div class="flex my-1 gap-2">
-			<div class="flex-1">
-				<Label for="cmd">Container command</Label>
-				<Input
-					id="cmd"
-					type="text"
-					placeholder="command"
-					bind:value={data.cmd}
-				/>
-			</div>
-			<div class="flex-1">
-				<Label for="entrypoint">Container entrypoint</Label>
-				<Input
-					id="entrypoint"
-					type="text"
-					placeholder="entrypoint"
-					bind:value={data.entrypoint}
-				/>
-			</div>
-		</div>
-		<div>
-			<Switch id="networking" bind:checked={data.networkDisabled} />
-			<Label for="networking">Disable networking</Label>
-		</div>
-		<div>
-			<Label for="volumes">Container volumes</Label>
-			<Textarea
-				id="volumes"
-				placeholder="volume:/path"
-				bind:value={data.volumes}
-			/>
-		</div>
-		<div class="my-1">
-			<Label for="env">Environment variables</Label>
-			<Textarea id="env" placeholder="key=value" bind:value={data.env} />
-		</div>
-		<div class="my-1">
-			<Label for="ports">Container ports</Label>
-			<Textarea
-				id="ports"
-				placeholder="8080:80"
-				bind:value={data.ports}
-			/>
-		</div>
-		<div class="my-1">
-			<Label for="labels">Container labels</Label>
-			<Textarea
-				id="labels"
-				placeholder="key=value"
-				bind:value={data.labels}
-			/>
-		</div>
+		{/if}
 	</div>
 </div>

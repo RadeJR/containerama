@@ -1,16 +1,19 @@
 package services
 
 import (
+	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/RadeJR/containerama/db"
 	"github.com/RadeJR/containerama/types"
 )
 
-func GetStacks(userID int, role string) ([]types.Stack, error) {
+func GetStacks(userID string, isAdmin bool) ([]types.Stack, error) {
 	var stacks []types.Stack
 	var err error
 
-	if role == "admin" {
+	if isAdmin {
 		err = db.DB.Select(&stacks, "SELECT * FROM stacks")
 	} else {
 		err = db.DB.Select(&stacks, "SELECT * FROM stacks WHERE user_id = ?", userID)
@@ -21,17 +24,19 @@ func GetStacks(userID int, role string) ([]types.Stack, error) {
 	return stacks, nil
 }
 
-func CountStacks(userId int, role string) (int, error) {
-	var count int
-	var err error
-
-	if role == "admin" {
-		err = db.DB.Get(count, "SELECT count(*) FROM stacks")
-	} else {
-		err = db.DB.Get(count, "SELECT count(*) FROM stacks WHERE user_id = ?", userId)
-	}
+func CreateStackFromFile(name string, userID string, filePath string) error {
+	pathDir := filepath.Dir(filePath)
+	args := "compose --project-directory " + pathDir + " up -d"
+	cmd := exec.Command("docker", strings.Split(args, " ")...)
+	_, err := cmd.Output()
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return count, nil
+
+	_, err = db.DB.Exec("INSERT INTO stacks (name, path_to_file, user_id ) VALUES(?, ?, ?)", name, filePath, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

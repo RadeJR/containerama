@@ -2,38 +2,10 @@
   import Ellipsis from "lucide-svelte/icons/ellipsis";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import { Button } from "$lib/components/ui/button";
-  import type { AxiosResponse } from "axios";
-  import { getAxios } from "$conf/axios";
   import { push } from "svelte-spa-router";
 
-  export let id: string;
-  export let state: string;
-  export let updateTable: Function;
+  export let id: number;
 
-  async function stopContainer() {
-    let result: AxiosResponse = await getAxios().put(
-      `/api/containers/${id}/stop`,
-    );
-    if (result.status == 204) {
-      updateTable();
-    }
-  }
-  async function startContainer() {
-    let result: AxiosResponse = await getAxios().put(
-      `/api/containers/${id}/start`,
-    );
-    if (result.status == 204) {
-      updateTable();
-    }
-  }
-  async function removeContainer() {
-    let result: AxiosResponse = await getAxios().delete(
-      `/api/containers/${id}`,
-    );
-    if (result.status == 204) {
-      updateTable();
-    }
-  }
   function showLogs(e: Event) {
     e.preventDefault();
     push(`/containers/${id}/logs`);
@@ -58,21 +30,9 @@
   <DropdownMenu.Content>
     <DropdownMenu.Group>
       <DropdownMenu.Label>Actions</DropdownMenu.Label>
-      <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id)}>
+      <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(String(id))}>
         Copy container ID
       </DropdownMenu.Item>
-      {#if state == "running"}
-        <DropdownMenu.Item on:click={stopContainer}>
-          Stop container
-        </DropdownMenu.Item>
-      {:else}
-        <DropdownMenu.Item on:click={startContainer}>
-          Start container
-        </DropdownMenu.Item>
-        <DropdownMenu.Item on:click={removeContainer}>
-          Remove container
-        </DropdownMenu.Item>
-      {/if}
       <DropdownMenu.Item on:click={showLogs}>Show logs</DropdownMenu.Item>
     </DropdownMenu.Group>
   </DropdownMenu.Content>
