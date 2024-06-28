@@ -3,6 +3,7 @@ package middleware
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/RadeJR/containerama/types"
@@ -22,11 +23,18 @@ func InitializeKeyFunc() {
 
 func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		var rawToken string
 		cookie, err := c.Cookie("access_token")
 		if err != nil {
-			return echo.ErrUnauthorized
+			rawToken = strings.Split(c.Request().Header["Authorization"][0], " ")[1]
+			if rawToken == "" {
+				return echo.ErrUnauthorized
+			}
+		} else {
+			rawToken = cookie.Value
 		}
-		token, err := jwt.ParseWithClaims(cookie.Value, &types.ZitadelClaims{}, k.Keyfunc)
+
+		token, err := jwt.ParseWithClaims(rawToken, &types.ZitadelClaims{}, k.Keyfunc)
 		if err != nil || !token.Valid {
 			return echo.ErrUnauthorized
 		}

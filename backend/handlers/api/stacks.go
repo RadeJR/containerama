@@ -3,8 +3,6 @@ package api
 import (
 	"log/slog"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/RadeJR/containerama/services"
 	"github.com/RadeJR/containerama/types"
@@ -27,7 +25,7 @@ func GetStacks(c echo.Context) error {
 	return c.JSON(http.StatusOK, stacks)
 }
 
-func CreateStackFromFileHandler(c echo.Context) error {
+func CreateStack(c echo.Context) error {
 	claims := c.Get("user").(*types.ZitadelClaims)
 	userID := claims.Subject
 
@@ -37,23 +35,29 @@ func CreateStackFromFileHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to parse data")
 	}
 	
-	path := "data/stacks/"+data.Name+"/docker-compose.yml"
-	err = os.MkdirAll(filepath.Dir(path), os.ModePerm)
-	if err != nil {
-		slog.Error("Error creating directories")
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
-	}
-	err = os.WriteFile(path, []byte(data.Content), 0644)
-	if err != nil {
-		slog.Error("Error creating file", "error", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
-	}
-
-	err = services.CreateStackFromFile(data.Name, userID, path)
+	err = services.CreateStack(data, userID)
 	if err != nil {
 		slog.Error("Error creating stack", "error", err)
 		return err
 	}
 	
 	return c.JSON(http.StatusOK, "success")
+}
+
+func DeleteStack(c echo.Context) error {
+	claims := c.Get("user").(*types.ZitadelClaims)
+	userID := claims.Subject
+
+	name := c.QueryParam("name")
+	if name == "" {
+		return echo.ErrUnprocessableEntity
+	}
+
+	err := services.DeleteStack(name, userID)
+	if err != nil {
+		slog.Error("Error deleting stack", "error", err)
+		return echo.ErrInternalServerError
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }

@@ -1,10 +1,18 @@
 export class StackFileData {
   name: string;
   content: string;
+  webhook: string;
+  repo: string;
+  repo_token: string;
+  file_in_repo: string;
 
   constructor() {
     this.name = "";
     this.content = "";
+    this.webhook = "";
+    this.repo = "";
+    this.repo_token = "";
+    this.file_in_repo = "";
   }
 }
 

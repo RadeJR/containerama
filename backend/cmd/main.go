@@ -66,7 +66,8 @@ func main() {
 
 	apistacks := api.Group("/stacks", middleware.JWTMiddleware)
 	apistacks.GET("", apihandlers.GetStacks)
-	apistacks.POST("/createfromfile", apihandlers.CreateStackFromFileHandler)
+	apistacks.POST("", apihandlers.CreateStack)
+	apistacks.DELETE("", apihandlers.DeleteStack)
 
 	app.Start(os.Getenv("BIND_ADDR"))
 }

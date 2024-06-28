@@ -13,6 +13,10 @@ type Stack struct {
 }
 
 type StackData struct {
-	Name    string `json:"name"`
-	Content string `json:"content"`
+	Name       string `json:"name"`
+	Webhook    string `json:"webhook"`
+	Repo       string `json:"repo"`
+	RepoToken  string `json:"repo_token"`
+	FileInRepo string `json:"file_in_repo"`
+	Content    string `json:"content"`
 }
