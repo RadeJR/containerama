@@ -8,7 +8,10 @@
 	import { getAxios } from "$conf/axios";
 	import { push } from "svelte-spa-router";
 	import YamlEditor from "./YamlEditor.svelte";
-	import {v4 as uuidv4} from 'uuid';
+	import { v4 as uuidv4 } from "uuid";
+	import Spinner from "$lib/components/ui/spinner/spinner.svelte";
+
+	var isLoading = false;
 
 	let useCompose: boolean = false;
 	let createWebhook: boolean = false;
@@ -21,10 +24,14 @@
 
 	let data: StackFileData = new StackFileData();
 	async function send() {
+		isLoading = true;
 		await getAxios()
 			.post("/api/stacks", data)
 			.then(() => {
 				push("/stacks");
+			})
+			.finally(() => {
+				isLoading = false;
 			});
 	}
 </script>
@@ -37,7 +44,14 @@
 				<Switch id="usecompose" bind:checked={useCompose} />
 				<Label for="usecompose">Use compose file</Label>
 			</div>
-			<Button on:click={send} variant="outline">Create</Button>
+			<div class="flex gap-3">
+				{#if isLoading}
+					<Spinner />
+				{/if}
+				<Button on:click={send} disabled={isLoading} variant="outline"
+					>Create</Button
+				>
+			</div>
 		</div>
 	</div>
 	<div class="rounded-md border p-5">
