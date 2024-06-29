@@ -26,8 +26,13 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		var rawToken string
 		cookie, err := c.Cookie("access_token")
 		if err != nil {
-			rawToken = strings.Split(c.Request().Header["Authorization"][0], " ")[1]
-			if rawToken == "" {
+			authHeader := c.Request().Header["Authorization"]
+			if len(authHeader) > 0 {
+				rawToken = strings.Split(authHeader[0], "Bearer ")[1]
+				if rawToken == "" {
+					return echo.ErrUnauthorized
+				}
+			} else {
 				return echo.ErrUnauthorized
 			}
 		} else {
@@ -44,7 +49,15 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.ErrUnauthorized
 		}
 
-		c.Set("user", claims)
+		userID := claims.Subject
+		var roles []string
+
+		for k := range claims.Roles {
+			roles = append(roles, k)
+		}
+
+		c.Set("userID", userID)
+		c.Set("roles", roles)
 		return next(c)
 	}
 }

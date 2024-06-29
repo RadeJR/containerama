@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/RadeJR/containerama/services"
@@ -11,25 +12,14 @@ import (
 )
 
 func GetContainers(c echo.Context) error {
-	claims := c.Get("user").(*types.ZitadelClaims)
-	userID := claims.Subject
-	isAdmin := false
-	if claims.Roles["admin"] != nil {
-		isAdmin = true
-	}
+	userID := c.Get("userID").(string)
+	roles := c.Get("roles").([]string)
 
 	var cont []dockertypes.Container
 	var err error
-	if isAdmin {
-		cont, err = services.GetContainers()
-		if err != nil {
-			return err
-		}
-	} else {
-		cont, err = services.GetUserContainers(userID)
-		if err != nil {
-			return err
-		}
+	cont, err = services.GetContainers(userID, roles)
+	if err != nil {
+		return err
 	}
 	return c.JSON(http.StatusOK, cont)
 }
@@ -43,10 +33,9 @@ func StopContainer(c echo.Context) error {
 }
 
 func CreateContainer(c echo.Context) error {
-	claims := c.Get("user").(*types.ZitadelClaims)
-	userID := claims.Subject
+	userID := c.Get("userID").(string)
 
-	var data services.ContainerData
+	var data types.ContainerData
 	err := c.Bind(&data)
 	if err != nil {
 		return err
@@ -89,16 +78,22 @@ func RemoveContainer(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func ShowContainer(c echo.Context) error {
-	cont, err := services.GetContainer(c.Param("id"))
+func GetContainer(c echo.Context) error {
+	userID := c.Get("userID").(string)
+	roles := c.Get("roles").([]string)
+
+	cont, err := services.GetContainer(c.Param("id"), userID, roles)
 	if err != nil {
-		return err
+		slog.Error("Error getting container", "error", err)
+		return echo.ErrNotFound
 	}
 	return c.JSON(http.StatusOK, cont)
 }
 
 func EditContainer(c echo.Context) error {
-	var data services.ContainerData
+	userID := c.Get("userID").(string)
+	
+	var data types.ContainerData
 	err := c.Bind(&data)
 	if err != nil {
 		return err
@@ -109,11 +104,11 @@ func EditContainer(c echo.Context) error {
 		return err
 	}
 
-	err = services.EditContainer(c.Param("id"), data)
+	id, err := services.EditContainer(c.Param("id"), data, userID)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusCreated, c.Param("id"))
+	return c.JSON(http.StatusCreated, id)
 }
 
 func ContainerLogs(c echo.Context) error {

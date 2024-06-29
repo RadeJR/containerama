@@ -3,58 +3,88 @@ package services
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"io"
 	"log/slog"
 	"os"
 	"strings"
 	"time"
 
+	localtypes "github.com/RadeJR/containerama/types"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 )
 
-type ContainerData struct {
-	Image           string `form:"image" validate:"required"`
-	Name            string `form:"name"`
-	Env             string `form:"env"`
-	Cmd             string `form:"cmd"`
-	Ports           string `form:"exposedPorts"`
-	Volumes         string `form:"volumes"`
-	Entrypoint      string `form:"entrypoint"`
-	Labels          string `form:"labels"`
-	NetworkDisabled bool   `form:"networkDisabled"`
-}
-
-func PaginateContainers(cont []types.Container, page int, size int) []types.Container {
-	count := len(cont)
-	lower := (page - 1) * size
-	upper := page * size
-	if upper > count {
-		upper = count
+func GetContainer(id string, userID string, roles []string) (types.ContainerJSON, error) {
+	cont, err := cli.ContainerInspect(context.Background(), id)
+	if err != nil && !client.IsErrNotFound(err) {
+		return types.ContainerJSON{}, err
 	}
-	return cont[lower:upper]
-}
+	if client.IsErrNotFound(err) {
+		return types.ContainerJSON{}, errors.New("Not found")
+	}
+	
+	for _,v := range roles {
+		if v == "admin" {
+			return cont, nil
+		}
+	}
 
-func GetContainers() ([]types.Container, error) {
-	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
+	if cont.Config.Labels["owner"] == userID {
+		return cont, nil
+	}
+
+	stacks, err := GetStacks(userID, roles)
 	if err != nil {
-		return nil, err
+		return types.ContainerJSON{}, err
 	}
-	return cont, nil
+
+	for _, v := range stacks {
+		if cont.Config.Labels["com.docker.compose.project"] == v.Name {
+			return cont, nil
+		}
+	}
+
+	return types.ContainerJSON{}, errors.New("Forbidden")
 }
 
-func GetUserContainers(userID string) ([]types.Container, error) {
+func GetContainers(userID string, roles []string) ([]types.Container, error) {
+	var cont []types.Container
+	var err error
+	for _, v := range roles {
+		if v == "admin" {
+			cont, err = cli.ContainerList(context.Background(), container.ListOptions{All: true})
+			if err != nil {
+				return nil, err
+			}
+			return cont, nil
+		}
+	}
+
 	filterArgs := filters.NewArgs()
 	filterArgs.Add("label", "owner="+userID)
-	// get standalone containers
-	cont, err := cli.ContainerList(context.Background(), container.ListOptions{All: true, Filters: filterArgs})
+	// get containers that user owns
+	cont, err = cli.ContainerList(context.Background(), container.ListOptions{All: true, Filters: filterArgs})
 	if err != nil {
 		return nil, err
 	}
-	stacks, err := GetStacks(userID, false)
+
+	// get containers that are owned by roles
+	for _, v := range roles {
+		filterArgs := filters.NewArgs()
+		filterArgs.Add("label", "roles="+v)
+		contFromRoles, err := cli.ContainerList(context.Background(), container.ListOptions{All: true, Filters: filterArgs})
+		if err != nil {
+			return nil, err
+		}
+		cont = append(cont, contFromRoles...)
+	}
+
+	stacks, err := GetStacks(userID, roles)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +103,8 @@ func GetUserContainers(userID string) ([]types.Container, error) {
 }
 
 func StopContainer(id string) error {
-	statusCh, errCh := cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
 	cli.ContainerStop(context.Background(), id, container.StopOptions{})
+	statusCh, errCh := cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
 	select {
 	case err := <-errCh:
 		if err != nil {
@@ -85,11 +115,10 @@ func StopContainer(id string) error {
 			return nil
 		}
 	}
-	time.Sleep(time.Second)
 	return nil
 }
 
-func CreateContainer(data ContainerData, userID string) (string, error) {
+func CreateContainer(data localtypes.ContainerData, userID string) (string, error) {
 	ctx := context.Background()
 
 	reader, err := cli.ImagePull(ctx, data.Image, image.PullOptions{})
@@ -202,25 +231,21 @@ func RemoveContainer(id string, force bool) error {
 	return nil
 }
 
-func GetContainer(id string) (types.ContainerJSON, error) {
-	cont, err := cli.ContainerInspect(context.Background(), id)
-	if err != nil {
-		return types.ContainerJSON{}, err
-	}
-	return cont, nil
-}
-
-func EditContainer(id string, data ContainerData) error {
+func EditContainer(id string, data localtypes.ContainerData, userID string) (string, error) {
 	if err := StopContainer(id); err != nil {
-		return err
+		slog.Error("Error stopping container", "msg", err.Error())
+		return "", err
 	}
 	if err := RemoveContainer(id, true); err != nil {
-		return err
+		slog.Error("Error removing container", "msg", err.Error())
+		return "", err
 	}
-	if _, err := CreateContainer(data, ""); err != nil {
-		return err
+	id, err := CreateContainer(data, userID)
+	if err != nil {
+		slog.Error("Error creating container", "msg", err.Error())
+		return "", err
 	}
-	return nil
+	return id, nil
 }
 
 func ContainerLogs(ctx context.Context, id string, logCh chan string) {

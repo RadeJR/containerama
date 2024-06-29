@@ -11,23 +11,39 @@ import (
 	"github.com/RadeJR/containerama/types"
 )
 
-func GetStacks(userID string, isAdmin bool) ([]types.Stack, error) {
-	var stacks []types.Stack
+func GetStacks(userID string, roles []string) ([]types.Stack, error) {
+	var result []types.Stack
 	var err error
-
-	if isAdmin {
-		err = db.DB.Select(&stacks, "SELECT * FROM stacks")
-	} else {
-		err = db.DB.Select(&stacks, "SELECT * FROM stacks WHERE user_id = ?", userID)
+	for _, v := range roles {
+		if v == "admin" {
+			err = db.DB.Select(&result, "SELECT * FROM stacks")
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
+		}
 	}
+	var stacks []types.Stack
+
+	// get stack that user owns
+	err = db.DB.Select(&result, "SELECT * FROM stacks WHERE user_id = ?", userID)
 	if err != nil {
 		return nil, err
 	}
-	return stacks, nil
+
+	// get stack that are owned by roles
+	for _, v := range roles {
+		err = db.DB.Select(&stacks, "SELECT * FROM stacks WHERE roles LIKE '%?%'", v)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, stacks...)
+	}
+	return result, nil
 }
 
 func CreateStack(data types.StackData, userID string) error {
-	path := "data/stacks/"+data.Name+"/docker-compose.yml"
+	path := "data/stacks/" + data.Name + "/docker-compose.yml"
 	err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
 		slog.Error("Error creating directories")

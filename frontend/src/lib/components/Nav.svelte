@@ -2,7 +2,6 @@
   // icons
   import Package from "lucide-svelte/icons/package";
   import Network from "lucide-svelte/icons/network";
-  import Users from "lucide-svelte/icons/users";
   import Layers from "lucide-svelte/icons/layers"
   // packages
   import { link } from "svelte-spa-router";
@@ -46,9 +45,5 @@
   <a href="/stacks" use:link class={navInactiveClass}>
     <Layers class="h-4 w-4" />
     Stacks
-  </a>
-  <a href="/users" use:link class={navInactiveClass}>
-    <Users class="h-4 w-4" />
-    Users
   </a>
 </nav>

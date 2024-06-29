@@ -18,6 +18,10 @@
       updateTable();
     }
   }
+  function editContainer(e: Event) {
+    e.preventDefault();
+    push(`/containers/${id}/edit`);
+  }
   async function startContainer() {
     let result: AxiosResponse = await getAxios().put(
       `/api/containers/${id}/start`,
@@ -73,6 +77,9 @@
           Remove container
         </DropdownMenu.Item>
       {/if}
+      <DropdownMenu.Item on:click={editContainer}>
+        Edit container
+      </DropdownMenu.Item>
       <DropdownMenu.Item on:click={showLogs}>Show logs</DropdownMenu.Item>
     </DropdownMenu.Group>
   </DropdownMenu.Content>

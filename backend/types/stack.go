@@ -10,6 +10,7 @@ type Stack struct {
 	UserID       int            `db:"user_id"`
 	RepositoryID sql.NullInt32  `db:"repository_id"`
 	Branch       sql.NullString `db:"branch"`
+	Roles        sql.NullString `db:"roles"`
 }
 
 type StackData struct {

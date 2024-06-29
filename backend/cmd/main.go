@@ -58,10 +58,12 @@ func main() {
 
 	apicontainers := api.Group("/containers", middleware.JWTMiddleware)
 	apicontainers.GET("", apihandlers.GetContainers)
+	apicontainers.GET("/:id", apihandlers.GetContainer)
 	apicontainers.PUT("/:id/stop", apihandlers.StopContainer)
 	apicontainers.PUT("/:id/start", apihandlers.StartContainer)
 	apicontainers.DELETE("/:id", apihandlers.RemoveContainer)
 	apicontainers.GET("/:id/logs", apihandlers.ContainerLogs)
+	apicontainers.PATCH("/:id", apihandlers.EditContainer)
 	apicontainers.POST("/create", apihandlers.CreateContainer)
 
 	apistacks := api.Group("/stacks", middleware.JWTMiddleware)

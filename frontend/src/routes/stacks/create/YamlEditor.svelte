@@ -6,7 +6,6 @@
 	import { keymap } from "@codemirror/view";
 	import { indentWithTab } from "@codemirror/commands";
 	import { catppuccin } from "codemirror-theme-catppuccin";
-	import { writable } from "svelte/store";
 
 	const variant = "mocha";
 	const theme = catppuccin(variant);

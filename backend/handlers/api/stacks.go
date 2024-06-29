@@ -10,14 +10,10 @@ import (
 )
 
 func GetStacks(c echo.Context) error {
-	claims := c.Get("user").(*types.ZitadelClaims)
-	userID := claims.Subject
-	isAdmin := false
-	if claims.Roles["admin"] != nil {
-		isAdmin = true
-	}
+	userID := c.Get("userID").(string)
+	roles := c.Get("roles").([]string)
 
-	stacks, err := services.GetStacks(userID, isAdmin)
+	stacks, err := services.GetStacks(userID, roles)
 	if err != nil {
 		return err
 	}
@@ -26,27 +22,25 @@ func GetStacks(c echo.Context) error {
 }
 
 func CreateStack(c echo.Context) error {
-	claims := c.Get("user").(*types.ZitadelClaims)
-	userID := claims.Subject
+	userID := c.Get("userID").(string)
 
 	var data types.StackData
 	err := c.Bind(&data)
-	if err!=nil{
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to parse data")
 	}
-	
+
 	err = services.CreateStack(data, userID)
 	if err != nil {
 		slog.Error("Error creating stack", "error", err)
 		return err
 	}
-	
+
 	return c.JSON(http.StatusOK, "success")
 }
 
 func DeleteStack(c echo.Context) error {
-	claims := c.Get("user").(*types.ZitadelClaims)
-	userID := claims.Subject
+	userID := c.Get("userID").(string)
 
 	name := c.QueryParam("name")
 	if name == "" {

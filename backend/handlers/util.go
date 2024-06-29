@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"net/http"
 	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 func CustomHTTPErrorHandler(err error, c echo.Context) {
