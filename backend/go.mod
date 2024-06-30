@@ -22,6 +22,8 @@ require (
 	golang.org/x/oauth2 v0.20.0
 )
 
+require gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+
 require (
 	github.com/MicahParks/jwkset v0.5.18 // indirect
 	github.com/Microsoft/go-winio v0.4.14 // indirect
@@ -35,6 +37,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/gorilla/context v1.1.1 // indirect

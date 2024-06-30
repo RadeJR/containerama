@@ -98,3 +98,22 @@ func DeleteStack(name string, userID string) error {
 
 	return nil
 }
+
+func StackWebhook(webhook string) error {
+	var stack types.Stack
+	err := db.DB.Get(&stack, "SELECT * FROM stacks WHERE webhook = ?", webhook)
+	if err != nil {
+		return err
+	}
+	pathDir := filepath.Dir(stack.PathToFile)
+	args := "compose --project-directory " + pathDir + " up -d --pull always"
+	cmd := exec.Command("docker", strings.Split(args, " ")...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

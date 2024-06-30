@@ -51,6 +51,7 @@ func main() {
 	app.GET("/login", auth.LoginHandler)
 	app.GET("/callback", auth.CallbackHandler)
 	app.GET("/logout", auth.LogoutHandler)
+	app.GET("/webhook/:id", apihandlers.StackWebhook)
 
 	// API
 	api := app.Group("/api", middleware.JWTMiddleware)

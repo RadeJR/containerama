@@ -1,11 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/RadeJR/containerama/services"
 	"github.com/RadeJR/containerama/types"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,6 +30,18 @@ func CreateStack(c echo.Context) error {
 	err := c.Bind(&data)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to parse data")
+	}
+
+	err = services.Validate.Struct(data)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return err
+		}
+		var msg []string
+		for _, err := range err.(validator.ValidationErrors) {
+			msg = append(msg, fmt.Sprintf("Field %v validation failed on the %v tag", err.Field(), err.Tag()))
+		}
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, msg)
 	}
 
 	err = services.CreateStack(data, userID)
@@ -53,5 +67,10 @@ func DeleteStack(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
+	return c.NoContent(http.StatusNoContent)
+}
+
+func StackWebhook(c echo.Context) error {
+	services.StackWebhook(c.Param("id"))
 	return c.NoContent(http.StatusNoContent)
 }

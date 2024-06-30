@@ -14,10 +14,10 @@ type Stack struct {
 }
 
 type StackData struct {
-	Name       string `json:"name"`
+	Name       string `json:"name" validate:"required"`
 	Webhook    string `json:"webhook"`
-	Repo       string `json:"repo"`
+	Repo       string `json:"repo" validate:"required_without=Content"`
 	RepoToken  string `json:"repo_token"`
 	FileInRepo string `json:"file_in_repo"`
-	Content    string `json:"content"`
+	Content    string `json:"content" validate:"required_without=Repo"`
 }

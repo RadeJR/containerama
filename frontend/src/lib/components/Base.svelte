@@ -11,6 +11,7 @@
   import { isAuthorized } from "$store";
   import { User } from "$app/types/user";
   import { CircleUser } from "lucide-svelte";
+  import { title } from "$store";
 
   export let user: User;
 
@@ -59,6 +60,7 @@
           <Nav />
         </Sheet.Content>
       </Sheet.Root>
+      <h3>{$title}</h3>
       <div class="ml-auto flex gap-2">
         <LightSwitch />
         <DropdownMenu.Root>

@@ -139,7 +139,7 @@
     .filter(([, hide]) => !hide)
     .map(([id]) => id);
 
-  const hidableCols = ["Image", "Ports", "State"];
+  const hidableCols = ["PathToFile"];
 </script>
 
 <div>
