@@ -32,6 +32,7 @@ func init() {
 func main() {
 	defer db.CloseDB()
 	defer services.CloseClient()
+
 	app := echo.New()
 	app.HTTPErrorHandler = handlers.CustomHTTPErrorHandler
 	// STATIC

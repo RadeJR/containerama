@@ -13,6 +13,8 @@
 	import * as Tabs from "$lib/components/ui/tabs";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { title } from "$store";
+	import { toast } from "svelte-sonner";
+	import axios from "axios";
 
 	title.set("Create a Stack");
 
@@ -37,10 +39,23 @@
 	let data: StackFileData = new StackFileData();
 	async function send() {
 		isLoading = true;
-		await getAxios()
+		await axios
 			.post("/api/stacks", data)
 			.then(() => {
 				push("/stacks");
+				toast.success("Stack has been created");
+			})
+			.catch(function (error) {
+				if (error.response) {
+					toast.error("An error occured", {
+						description: error.response.data.message.join("\n"),
+					});
+				} else if (error.request) {
+					console.log(error.request);
+				} else {
+					// Something happened in setting up the request that triggered an Error
+					console.log("Error", error.message);
+				}
 			})
 			.finally(() => {
 				isLoading = false;
@@ -87,28 +102,9 @@
 				>
 			</Tabs.List>
 			<Tabs.Content value="git">
-				<Card.Root>
-					<Card.Header>
-						<Card.Title>Account</Card.Title>
-						<Card.Description>
-							Make changes to your account here. Click save when
-							you're done.
-						</Card.Description>
-					</Card.Header>
-					<Card.Content class="space-y-2">
-						<div class="space-y-1">
-							<Label for="name">Name</Label>
-							<Input id="name" value="Pedro Duarte" />
-						</div>
-						<div class="space-y-1">
-							<Label for="username">Username</Label>
-							<Input id="username" value="@peduarte" />
-						</div>
-					</Card.Content>
-					<Card.Footer>
-						<Button>Save changes</Button>
-					</Card.Footer>
-				</Card.Root>
+				<div class="w-full h-[200px] content-center items-center flex justify-around">
+					<h1>Comming Soon</h1>
+				</div>
 			</Tabs.Content>
 			<Tabs.Content value="file">
 				<Card.Root>

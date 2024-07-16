@@ -31,8 +31,10 @@
     <DropdownMenu.Group>
       <DropdownMenu.Label>Actions</DropdownMenu.Label>
       <DropdownMenu.Item on:click={() => navigator.clipboard.writeText(String(id))}>
-        Copy container ID
+        Copy stack ID
       </DropdownMenu.Item>
+      <DropdownMenu.Item on:click={showLogs}>Delete Stack</DropdownMenu.Item>
+      <DropdownMenu.Item on:click={showLogs}>Edit Stack</DropdownMenu.Item>
       <DropdownMenu.Item on:click={showLogs}>Show logs</DropdownMenu.Item>
     </DropdownMenu.Group>
   </DropdownMenu.Content>

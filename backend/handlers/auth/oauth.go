@@ -38,14 +38,16 @@ func InitializeOauth() {
 }
 
 func LoginHandler(c echo.Context) error {
-	verifier := oauth2.GenerateVerifier()
-	authURL := oauthConfig.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))
+	code_verifier := oauth2.GenerateVerifier()
+	authOption := oauth2.S256ChallengeOption(code_verifier)
+
+	authURL := oauthConfig.AuthCodeURL(state, authOption)
 
 	sess, err := session.Get("session", c)
 	if err != nil {
 		return err
 	}
-	sess.Values["code_verifier"] = verifier
+	sess.Values["code_verifier"] = code_verifier
 
 	if err := sess.Save(c.Request(), c.Response()); err != nil {
 		return err

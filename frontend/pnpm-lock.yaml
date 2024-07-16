@@ -59,6 +59,9 @@ importers:
       svelte-radix:
         specifier: ^1.1.0
         version: 1.1.0(svelte@4.2.16)
+      svelte-sonner:
+        specifier: ^0.3.24
+        version: 0.3.24(svelte@4.2.16)
       svelte-spa-router:
         specifier: ^4.0.1
         version: 4.0.1
@@ -1233,6 +1236,11 @@ packages:
     resolution: {integrity: sha512-RpB0SurwXm4xhjvHHtjeqMmvd645FURb79GFOotScOSqnKK5vpqBgoBPGC0pp+E/eZgDSQ9rRAdn/+N4ys1mXQ==}
     peerDependencies:
       svelte: ^4.0.0
+
+  svelte-sonner@0.3.24:
+    resolution: {integrity: sha512-txuL0JBUs0v6qGrr0PGCsbXmKHuthdrAkfISYi8umuveF7+gINb6EXl6VmKY9aHhyxCqvVgqd6yophQNrnor4w==}
+    peerDependencies:
+      svelte: '>=3 <5'
 
   svelte-spa-router@4.0.1:
     resolution: {integrity: sha512-2JkmUQ2f9jRluijL58LtdQBIpynSbem2eBGp4zXdi7aDY1znbR6yjw0KsonD0aq2QLwf4Yx4tBJQjxIjgjXHKg==}
@@ -2422,6 +2430,10 @@ snapshots:
     dependencies:
       svelte: 4.2.16
       svelte-subscribe: 2.0.1(svelte@4.2.16)
+
+  svelte-sonner@0.3.24(svelte@4.2.16):
+    dependencies:
+      svelte: 4.2.16
 
   svelte-spa-router@4.0.1:
     dependencies:

@@ -11,6 +11,8 @@
   import { onMount } from "svelte";
   import { getAxios } from "$conf/axios";
   import { User } from "$app/types/user";
+  import { Toaster } from "$lib/components/ui/sonner";
+
   let user: User;
 
   async function checkIfLoggedIn() {
@@ -31,6 +33,7 @@
   });
 </script>
 
+<Toaster richColors />
 <ModeWatcher />
 {#if $isAuthorized}
   <Base {user}>

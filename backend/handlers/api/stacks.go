@@ -39,7 +39,11 @@ func CreateStack(c echo.Context) error {
 		}
 		var msg []string
 		for _, err := range err.(validator.ValidationErrors) {
-			msg = append(msg, fmt.Sprintf("Field %v validation failed on the %v tag", err.Field(), err.Tag()))
+			if err.Param() != "" {
+				msg = append(msg, fmt.Sprintf("%v is required without %v.", err.Field(), err.Param()))
+			} else {
+				msg = append(msg, fmt.Sprintf("%v is required.", err.Field()))
+			}
 		}
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, msg)
 	}
